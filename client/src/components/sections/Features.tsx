@@ -34,7 +34,10 @@ export default function Features() {
   ];
 
   return (
-    <section className="mt-20 py-12 px-6 md:px-12 lg:px-24  rounded-3xl w-[88%]">
+    <section
+      id="features"
+      className="mt-20 py-4 px-6 md:px-12 lg:px-24  rounded-3xl w-[88%]"
+    >
       <div className="text-center mb-12 justify-center flex items-center flex-col gap-2">
         <p className="inline-block px-4 py-2 mb-4 bg-emerald-100 text-emerald-700 rounded-full text-sm font-medium">
           Features

@@ -1,6 +1,18 @@
-# Task & Project Manager (Client)
+# 📌 Task & Project Manager
 
-This is the **frontend client** for the Task & Project Manager application, built with **React + TypeScript + Vite**.
+A full-stack **MERN + TypeScript** based Task & Project Management web app.  
+Users can create, manage, and track tasks/projects with authentication and responsive UI.
+
+---
+
+## 🚀 Features
+- ✅ User Authentication (JWT-based)
+- 📝 Create, Edit, and Delete Tasks
+- 📂 Project Management (link tasks to projects)
+- 🎨 Responsive UI with TailwindCSS
+- 🌙 Dark & Light Theme support
+- 📊 Dashboard with task stats & charts
+- 🔒 Private & Public Routes
 
 ---
 
@@ -15,24 +27,44 @@ This is the **frontend client** for the Task & Project Manager application, buil
 ## 📂 Folder Structure
 
 ```
-client/
-│── public/           # Static assets
-│── src/
-│   ├── assets/       # Images, fonts, global styles
-│   ├── components/   # Reusable UI components
-│   ├── features/     # Feature-based modules (tasks, projects, auth, etc.)
-│   ├── hooks/        # Custom React hooks
-│   ├── layouts/      # App layouts (Dashboard, Auth, etc.)
-│   ├── lib/          # API clients, utils, helpers
-│   ├── pages/        # App pages
-│   ├── routes/       # App routing config
-│   ├── store/        # State management (Zustand/Redux)
-│   ├── types/        # TypeScript types/interfaces
-│   ├── App.tsx       # Main app entry
-│   └── main.tsx      # React DOM entry
-│── package.json
-│── tsconfig.json
-│── vite.config.ts
+project-root/
+│── client/                  # Frontend app
+│   ├── public/              # Static assets
+│   ├── src/
+│   │   ├── assets/          # Images, fonts, global styles
+│   │   ├── components/      # Reusable UI components
+│   │   ├── features/        # Feature-based modules (tasks, projects, auth, etc.)
+│   │   ├── hooks/           # Custom React hooks
+│   │   ├── layouts/         # App layouts (Dashboard, Auth, etc.)
+│   │   ├── lib/             # API clients, utils, helpers
+│   │   ├── pages/           # App pages
+│   │   ├── routes/          # App routing config
+│   │   ├── store/           # Zustand/Redux store
+│   │   ├── types/           # TypeScript types/interfaces
+│   │   ├── App.tsx          # Main app entry
+│   │   └── main.tsx         # React DOM entry
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── vite.config.ts
+│
+│── server/                  # Backend API
+│   ├── src/
+│   │   ├── config/          # DB, environment, third-party configs
+│   │   ├── controllers/     # Route handlers (business logic)
+│   │   ├── middlewares/     # Express middlewares (auth, errors, validation)
+│   │   ├── models/          # Mongoose schemas & models
+│   │   ├── routes/          # API route definitions
+│   │   ├── services/        # Reusable logic (email, notifications, etc.)
+│   │   ├── utils/           # Helper functions
+│   │   ├── app.js           # Express app config
+│   │   └── server.js        # Server entry point
+│   ├── .env                 # Environment variables
+│   ├── package.json
+│   └── .gitignore
+│
+│── README.md
+│── .gitignore
+
 ```
 
 ---

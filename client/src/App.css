@@ -6,6 +6,31 @@ body{
   --font-heading: 'Poppins', sans-serif;
   --font-body: 'Inter', sans-serif;
 }
+/* For Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  width: 6px; /* scrollbar width */
+  height: 6px; /* scrollbar height (for horizontal) */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #a78bfa; /* violet-400 */
+  border-radius: 9999px; /* round edges */
+}
+
+::-webkit-scrollbar-track {
+  background: #f3f4f6; /* gray-100 */
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  
+}
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
 
 h1, h2, h3, .logo {
   font-family: var(--font-heading);

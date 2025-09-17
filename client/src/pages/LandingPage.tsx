@@ -1,17 +1,20 @@
 import React from "react";
-import Navbar from "../layout/Navbar";
-import Overview from "./Overview";
-import Features from "./Features";
-import TrustedBy from "./TrustedBy";
-import PricingPlan from "./PricingPlan";
-import Reviews from "./Reviews";
-import Footer from "./Footer";
+import Navbar from "../components/layout/Navbar";
+import Overview from "../components/sections/Overview";
+import TrustedBy from "../components/sections/TrustedBy";
+import Features from "../components/sections/Features";
+import PricingPlan from "../components/sections/PricingPlan";
+import Reviews from "../components/sections/Reviews";
+import Footer from "../components/sections/Footer";
 
 export default function HeroSection() {
   return (
     <div>
       <Navbar />
-      <div className="mt-24 flex flex-col justify-center items-center gap-3 text-center px-4 ">
+      <div
+        id="Home"
+        className="mt-24 flex flex-col justify-center items-center gap-3 text-center px-4 "
+      >
         {/* Headline */}
         <h1 className="font-heading text-4xl md:text-5xl font-bold leading-tight text-slate-900">
           Need more focus?

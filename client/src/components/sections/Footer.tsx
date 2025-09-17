@@ -3,7 +3,10 @@ import Image from "../../assets/logo.jpg";
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-800 text-gray-300 py-12 px-6 md:px-12 lg:px-24">
+    <footer
+      id="contact"
+      className="bg-slate-800  text-gray-300 py-12 px-6 md:px-12 lg:px-24"
+    >
       <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
         {/* Logo + About */}
         <div>

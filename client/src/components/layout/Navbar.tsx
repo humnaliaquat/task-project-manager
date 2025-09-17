@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import Image from "../../assets/logo.jpg";
 
 export default function Navbar() {
@@ -31,28 +32,34 @@ export default function Navbar() {
 
         {/* Links */}
         <div className="hidden md:flex gap-8 font-body text-gray-700">
-          <a href="#" className="hover:text-violet-600 transition">
+          <a href="/" className="hover:text-violet-600 transition">
             Home
           </a>
-          <a href="#" className="hover:text-violet-600 transition">
+          <a href="#features" className="hover:text-violet-600 transition">
             Features
           </a>
-          <a href="#" className="hover:text-violet-600 transition">
+          <a href="#pricing" className="hover:text-violet-600 transition">
             Pricing
           </a>
-          <a href="#" className="hover:text-violet-600 transition">
+          <a href="#contact" className="hover:text-violet-600 transition">
             Contact
           </a>
         </div>
 
         {/* Auth Buttons */}
         <div className="flex items-center gap-4">
-          <button className="text-gray-700 font-body hover:text-violet-600 transition cursor-pointer">
+          <Link
+            to="/login"
+            className="text-gray-700 font-body hover:text-violet-600 transition cursor-pointer"
+          >
             Login
-          </button>
-          <button className="px-5 py-2.5 bg-violet-500 text-white rounded-full font-medium cursor-pointer hover:bg-violet-600 transition">
+          </Link>
+          <Link
+            to="/register"
+            className="px-5 py-2.5 bg-violet-500 text-white rounded-full font-medium cursor-pointer hover:bg-violet-600 transition"
+          >
             Get Started
-          </button>
+          </Link>
         </div>
       </div>
     </nav>

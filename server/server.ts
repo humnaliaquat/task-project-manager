@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
+import dotenv from "dotenv"; dotenv.config();
 const express = require("express");
 const app = express();
-require("dotenv").config();
+
+require("./models/db.ts")
 
 const Port = process.env.PORT || 5000;
 app.get("/ping", (req: Request, res: Response) => {
