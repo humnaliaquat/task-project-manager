@@ -9,7 +9,7 @@ export default function TrustedBy() {
   ];
 
   return (
-    <section className="bg-orange-50 mt-16 py-8 px-6 md:px-12 lg:px-24 text-center w-[88%] rounded-3xl">
+    <section className="bg-violet-50 mt-16 py-8 px-6 md:px-12 lg:px-24 text-center w-[88%] rounded-3xl">
       <h2 className="text-sm md:text-base font-medium text-slate-800 mb-8">
         Trusted by teams and individuals around the world
       </h2>
