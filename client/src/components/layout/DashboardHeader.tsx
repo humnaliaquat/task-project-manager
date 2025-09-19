@@ -1,27 +1,35 @@
 import React from "react";
 import { Bell, Search, User } from "lucide-react";
+
 export default function DashboardHeader() {
   return (
-    <header className="flex justify-between items-center h-10  ">
+    <header className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0 h-auto  ">
       {/* Left Side - Title */}
-      <div>
-        <h1 className="text-2xl font-medium text-slate-700 ">Dashboard</h1>
-        <p className="text-gray-500 text-sm">
+      <div className="flex flex-col">
+        <p className="text-xl font-medium text-slate-800 sm:text-2xl">
+          Dashboard
+        </p>
+        <p className="text-gray-500 text-xs sm:text-sm">
           Monitor all of your projects and tasks here
         </p>
       </div>
 
       {/* Right Side - Actions */}
-      <div className="flex items-center gap-4">
-        {/* Search */}
+      <div className="flex items-center gap-2 sm:gap-4">
+        {/* Search (hidden input on mobile, icon only) */}
         <div className="hidden sm:flex items-center bg-violet-50 px-3 py-1.5 rounded-xl">
           <Search className="h-4 w-4 text-gray-500 mr-2" />
           <input
             type="text"
             placeholder="Search anything"
-            className="bg-transparent outline-none text-sm w-40"
+            className="bg-transparent outline-none text-sm w-36 sm:w-40"
           />
         </div>
+
+        {/* Mobile Search Icon */}
+        <button className="sm:hidden p-2 rounded-full hover:bg-violet-100 transition">
+          <Search className="h-5 w-5 text-gray-600" />
+        </button>
 
         {/* Notifications */}
         <button className="relative p-2 rounded-full hover:bg-violet-100 transition">
