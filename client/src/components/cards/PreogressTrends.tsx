@@ -26,7 +26,7 @@ const data = [
 
 export default function ProgressTrends() {
   return (
-    <div className="bg-white dark:bg-gray-800  p-4 border rounded-xl border-gray-200">
+    <div className="bg-white dark:bg-gray-800  p-3 border rounded-xl border-gray-200">
       <p className="text-xl font-medium text-slate-800 mb-4 ">
         Tasks Completed Per Month
       </p>

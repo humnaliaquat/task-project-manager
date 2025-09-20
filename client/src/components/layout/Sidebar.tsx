@@ -7,6 +7,7 @@ import {
   Calendar,
   BarChart2,
   Settings,
+  Trash,
   LogOut,
   Menu,
   X,
@@ -20,8 +21,7 @@ export default function Sidebar() {
     { path: "/dashboard", name: "Dashboard", icon: LayoutDashboard },
     { path: "/projects", name: "Projects", icon: Folder },
     { path: "/tasks", name: "Tasks", icon: ListTodo },
-    { path: "/calendar", name: "Calendar", icon: Calendar },
-    { path: "/analytics", name: "Analytics", icon: BarChart2 },
+    { path: "/trash", name: "Trash", icon: Trash },
   ];
 
   const general = [
@@ -41,8 +41,8 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <div
-        className={`fixed md:static top-0 left-0 h-screen w-64 bg-violet-50 border-r border-gray-100 shadow-md flex flex-col justify-between p-4 transform transition-transform duration-300 z-40
-          ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
+        className={`fixed md:sticky top-0 left-0 h-screen md:h-screen w-64 bg-violet-50 border-r border-gray-100 shadow-md flex flex-col justify-between p-4 transform transition-transform duration-300 z-40
+    ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
       >
         {/* Top Section */}
         <div>

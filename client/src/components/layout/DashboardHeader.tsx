@@ -1,17 +1,19 @@
 import React from "react";
 import { Bell, Search, User } from "lucide-react";
 
-export default function DashboardHeader() {
+type Props = {
+  title: string;
+  subtitle: string;
+};
+export default function DashboardHeader({ title, subtitle }: Props) {
   return (
-    <header className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0 h-auto  ">
+    <header className="sticky top-0 z-50 bg-white flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0 h-auto border-b border-gray-200 pb-2 p-4 pt-2">
       {/* Left Side - Title */}
       <div className="flex flex-col">
         <p className="text-xl font-medium text-slate-800 sm:text-2xl">
-          Dashboard
+          {title}
         </p>
-        <p className="text-gray-500 text-xs sm:text-sm">
-          Monitor all of your projects and tasks here
-        </p>
+        <p className="text-gray-500 text-xs sm:text-sm">{subtitle}</p>
       </div>
 
       {/* Right Side - Actions */}

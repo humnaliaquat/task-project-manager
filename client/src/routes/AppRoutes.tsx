@@ -4,6 +4,8 @@ import LandingPage from "../pages/LandingPage";
 import Login from "../pages/LoginPage";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import Dashboard from "../pages/Dashboard";
+import Projects from "../pages/Projects";
+import TasksPage from "../pages/TasksPage";
 export default function AppRoutes() {
   return (
     <Routes>
@@ -15,6 +17,8 @@ export default function AppRoutes() {
       {/* private routes */}
       <Route element={<DashboardLayout />}>
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/projects" element={<Projects />} />
+        <Route path="/tasks" element={<TasksPage />} />
       </Route>
     </Routes>
   );
