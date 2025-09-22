@@ -6,6 +6,8 @@ import AssignedTasks from "../components/cards/AssignedTasks";
 import Notepad from "../components/cards/Notepad";
 import AddThings from "../components/cards/AddThings";
 import WeeklyProjectsChart from "../components/cards/WeeklyProjectsChart";
+import DashboardOverview from "../components/cards/DashboardOverview";
+import TasksCreatedToday from "../components/cards/TasksCreatedToday";
 
 export default function Dashboard() {
   return (
@@ -16,11 +18,21 @@ export default function Dashboard() {
       />
       <AddThings />
       {/* Responsive grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-3 pt-2 p-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-3 pt-1 p-4">
+        <AssignedTasks />
         <ProgressTrends />
         <WeeklyProjectsChart />
-        <AssignedTasks />
-        <Notepad />
+      </div>
+      <div className="grid grid-cols-3 gap-4 p-4 pb-3 pt-2">
+        {/* Chart takes 2/3 of width */}
+        <div className="col-span-2">
+          <TasksCreatedToday />
+        </div>
+
+        {/* Notepad takes 1/3 of width */}
+        <div className="col-span-1">
+          <Notepad />
+        </div>
       </div>
     </div>
   );

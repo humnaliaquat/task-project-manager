@@ -15,13 +15,9 @@ const data = [
   { week: "Mar", completed: 3 },
   { week: "Apr", completed: 10 },
   { week: "May", completed: 7 },
-  { week: "Jun", completed: 7 },
-  { week: "Jul", completed: 3 },
-  { week: "Aug", completed: 5 },
-  { week: "Sep", completed: 7 },
-  { week: "Oct", completed: 6 },
-  { week: "Nov", completed: 8 },
-  { week: "Dec", completed: 4 },
+  { week: "Jun", completed: 3 },
+  { week: "Jul", completed: 6 },
+  { week: "Aug", completed: 9 },
 ];
 
 export default function ProgressTrends() {
@@ -31,7 +27,7 @@ export default function ProgressTrends() {
         Tasks Completed Per Month
       </p>
 
-      <ResponsiveContainer width="100%" height={200}>
+      <ResponsiveContainer width="100%" height={210}>
         <BarChart data={data} barCategoryGap="10%">
           <XAxis dataKey="week" tickLine={false} axisLine={false} />
 

@@ -17,7 +17,7 @@ export default function Notepad() {
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="Write your notes here..."
-          className="w-full h-35 resize-none rounded-lg p-4   focus:outline-none focus:ring-none "
+          className="w-full h-42 resize-none rounded-lg p-4   focus:outline-none focus:ring-none "
         />
       </main>
 

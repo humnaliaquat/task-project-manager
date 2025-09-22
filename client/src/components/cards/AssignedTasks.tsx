@@ -30,7 +30,7 @@ export default function AssignedTasks() {
       </div>
 
       {/* Task List */}
-      <div className="divide-y divide-gray-200 dark:divide-gray-700">
+      <div className="divide-y divide-gray-200 ">
         {collection.map((item, index) => (
           <div
             key={index}

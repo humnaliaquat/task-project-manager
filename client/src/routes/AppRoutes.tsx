@@ -6,6 +6,7 @@ import DashboardLayout from "../components/layout/DashboardLayout";
 import Dashboard from "../pages/Dashboard";
 import Projects from "../pages/Projects";
 import TasksPage from "../pages/TasksPage";
+import ProjectDetails from "../components/projects/ProjectDetails";
 export default function AppRoutes() {
   return (
     <Routes>
@@ -19,6 +20,7 @@ export default function AppRoutes() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/tasks" element={<TasksPage />} />
+        <Route path="/projects/:id" element={<ProjectDetails />} />
       </Route>
     </Routes>
   );
