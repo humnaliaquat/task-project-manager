@@ -1,6 +1,7 @@
 // keep your imports same
 import React, { useState } from "react";
 import { Trash2 } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { Link } from "react-router-dom";
 
 type Project = {
@@ -160,9 +161,14 @@ export default function ListModeProjects() {
                 </td>
                 <td className="px-4 text-center">{project.totaltasks}</td>
                 <td className="px-4 text-center">
-                  <button className="text-red-500 hover:text-red-700 cursor-pointer">
-                    <Trash2 size={18} />
-                  </button>
+                  <div className="flex justify-center items-center gap-2">
+                    <button className="text-red-500 hover:text-red-700 cursor-pointer">
+                      <Trash2 size={18} />
+                    </button>
+                    <button className="text-gray-600 hover:text-gray-800 cursor-pointer">
+                      <MoreHorizontal size={18} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

@@ -39,4 +39,9 @@ h1, h2, h3, .logo {
 body, p, span, button, input {
   font-family: var(--font-body);
 }
+.rdp-root {
+  --rdp-accent-color: #8b5cf6; 
+  --rdp-accent-background-color: #f0f0f0; /
+}
+
 

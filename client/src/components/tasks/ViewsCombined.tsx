@@ -1,20 +1,17 @@
 import { useState } from "react";
-import { Search, List, LayoutGrid, X } from "lucide-react";
-import CardsModeProjects from "./CardsModeProjects";
-import ListModeProjects from "./ListModeProjects";
-import AddProjectModal from "../projects/AddProjectModal";
-
-export default function ProjectCards() {
+import { Search, List, LayoutGrid, Plus, X } from "lucide-react";
+import BoardView from "./BoardView";
+import ListView from "./ListView";
+import AddNewTask from "./AddNewTask";
+export default function ViewsCombined() {
   const [isOpen, setIsOpen] = useState(false);
   const params =
     typeof window !== "undefined"
       ? new URLSearchParams(window.location.search)
       : new URLSearchParams();
-
   const [viewMode, setViewMode] = useState<"board" | "list">(
     (params.get("view") as "board" | "list") || "board"
   );
-
   const handleViewChange = (mode: "board" | "list") => {
     setViewMode(mode);
     if (typeof window !== "undefined") {
@@ -23,10 +20,8 @@ export default function ProjectCards() {
       window.history.pushState({}, "", url);
     }
   };
-
   return (
-    <div className="p-4 mt-2 rounded-2xl flex flex-col w-full bg-white border border-gray-200 ">
-      {/* Header with search + buttons */}
+    <div className="p-4  rounded-2xl flex flex-col w-full bg-white border border-gray-200 ">
       <header className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-4">
         {/* Search */}
         <div className="relative w-full sm:w-64">
@@ -68,35 +63,37 @@ export default function ProjectCards() {
           </div>
 
           {/* Add Project */}
+
           <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="bg-violet-500 hover:bg-violet-600 px-4 sm:px-5 py-2 rounded-full text-white text-sm shadow cursor-pointer relative"
+            onClick={() => setIsOpen(true)}
+            className="bg-violet-500 hover:bg-violet-600 px-4 sm:px-5 py-2 flex items-center justify-center gap-1 rounded-full text-white text-sm shadow cursor-pointer"
           >
-            + Add Project
+            <Plus className="h-4 w-4" />
+            <span className="hidden sm:inline">Add Task</span>
           </button>
+
+          {/* Modal */}
           {isOpen && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 overflow-y-auto p-5 pt-14">
+            <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 overflow-y-auto ">
               <div className="bg-white  rounded-xl  w-[90%] max-w-md p-6 relative ">
                 {/* Close Button */}
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="absolute -top-2 -right-2 bg-violet-200 shadow-2xl rounded-full w-8 h-8 flex items-center justify-center text-violet-900 hover:bg-violet-300 cursor-pointer"
+                  className="absolute -top-2 -right-2 bg-violet-200 shadow-2xl rounded-full w-8.5 h-8.5 flex items-center justify-center text-violet-900 hover:bg-violet-300 cursor-pointer"
                 >
                   <X size={18} />
                 </button>
 
                 {/* Your Form */}
-                <AddProjectModal onClose={() => setIsOpen(false)} />
+                <AddNewTask onClose={() => setIsOpen(false)} />
               </div>
             </div>
           )}
         </div>
       </header>
-
-      {/* Main Content */}
-      <div className="overflow-x-auto ">
-        {viewMode === "board" ? <CardsModeProjects /> : <ListModeProjects />}
-      </div>
+      <main className="overflow-x-auto">
+        {viewMode === "board" ? <BoardView /> : <ListView />}
+      </main>
     </div>
   );
 }
