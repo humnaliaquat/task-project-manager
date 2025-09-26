@@ -1,21 +1,30 @@
-import express, { Request, Response } from "express";
-import bodyParser from "body-parser";
-import cors from "cors";
 import dotenv from "dotenv";
-
 dotenv.config();
+
+import express, { Request, Response } from "express";
+import cors from "cors";
+import bodyParser from "body-parser";
+import AuthRouter from "./routes/AuthRouter";
 
 // DB connection
 import "./models/db";
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
 
-// Routes
+// Use Auth routes
+app.use("/auth", AuthRouter);
+
+// ✅ Default home route
+app.get("/", (req: Request, res: Response) => {
+  res.send("Welcome! 🚀 Your server is running.");
+});
+
+// Ping route
 app.get("/ping", (req: Request, res: Response) => {
   res.send("PONG");
 });

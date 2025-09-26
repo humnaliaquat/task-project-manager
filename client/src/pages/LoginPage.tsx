@@ -1,7 +1,60 @@
-import React from "react";
+import React, { useState, type ChangeEvent } from "react";
+import { useAuth } from "../context/AuthContext";
 import Image from "../assets/logo.jpg";
-
+import { ToastContainer } from "react-toastify";
+import { handleError, handleSuccess } from "../utils/utils";
+import { useNavigate } from "react-router-dom";
+type LoginInfo = {
+  email: string;
+  password: string;
+};
 export default function LoginPage() {
+  const [loginInfo, setLoginInfo] = useState<LoginInfo>({
+    email: "",
+    password: "",
+  });
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setLoginInfo((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+  const handleLogin = async (e: ChangeEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const { email, password } = loginInfo;
+    if (!email || !password) {
+      return handleError("Email and password are required");
+    }
+    try {
+      const url = "http://localhost:3000/auth/login";
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(loginInfo),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        login({
+          id: data.user.id,
+          name: data.user.name,
+          email: data.user.email,
+          token: data.token,
+        });
+        handleSuccess(data.message || "Login successful!");
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1000);
+      } else {
+        handleError(data.message || "Something went wrong");
+      }
+    } catch (error: any) {
+      handleError(error.message || "Network error");
+    }
+  };
   return (
     <div className="w-full min-h-screen grid grid-cols-1 md:grid-cols-2">
       {/* Left Section - Form */}
@@ -32,15 +85,18 @@ export default function LoginPage() {
           <div className="text-center text-gray-400 text-sm mb-3">or</div>
 
           {/* Form */}
-          <form className="flex flex-col gap-4">
+          <form onSubmit={handleLogin} className="flex flex-col gap-4">
             <div>
               <label htmlFor="name" className="text-sm text-gray-600">
-                Name
+                Email
               </label>
               <input
                 type="text"
                 id="name"
-                placeholder="Enter your name"
+                name="email"
+                value={loginInfo.email}
+                onChange={handleChange}
+                placeholder="Enter your email"
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm sm:text-base"
               />
             </div>
@@ -52,6 +108,9 @@ export default function LoginPage() {
               <input
                 type="password"
                 id="password"
+                name="password"
+                onChange={handleChange}
+                value={loginInfo.password}
                 placeholder="Enter your password"
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm sm:text-base"
               />
@@ -74,7 +133,7 @@ export default function LoginPage() {
 
             {/* Submit */}
             <button className="w-full py-2 bg-violet-500 text-white rounded-lg hover:bg-violet-600 transition cursor-pointer text-sm sm:text-base">
-              Sign Up
+              Login
             </button>
           </form>
 
@@ -101,6 +160,7 @@ export default function LoginPage() {
           Task & Project Manager.
         </p>
       </div>
+      <ToastContainer />
     </div>
   );
 }

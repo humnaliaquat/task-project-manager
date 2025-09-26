@@ -1,7 +1,63 @@
-import React from "react";
+import React, { useState } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import Image from "../assets/logo.jpg";
-
+import { ToastContainer } from "react-toastify";
+import { handleError, handleSuccess } from "../utils/utils";
+import { useNavigate } from "react-router-dom";
+type SignUpInfo = {
+  email: string;
+  password: string;
+  name: string;
+};
 export default function SignUp() {
+  const [signupInfo, setSignUpInfo] = useState<SignUpInfo>({
+    name: "",
+    email: "",
+    password: "",
+  });
+  const navigate = useNavigate();
+  const handleSignUp = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const { name, email, password } = signupInfo;
+    if (!name || !email || !password) {
+      return handleError("Name, email and password are required");
+    }
+
+    try {
+      const url = "http://localhost:3000/auth/signup";
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(signupInfo),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        handleSuccess(data.message || "Signup successful!");
+        setTimeout(() => {
+          navigate("/login");
+        }, 1000);
+      } else {
+        handleError(data.message || "Something went wrong");
+      }
+    } catch (error: any) {
+      handleError(error.message || "Network error");
+    }
+  };
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setSignUpInfo((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+  console.log("signupInfo -> ", signupInfo);
   return (
     <div className="w-full min-h-screen grid grid-cols-1 md:grid-cols-2">
       {/* Left Section - Form */}
@@ -32,7 +88,7 @@ export default function SignUp() {
           <div className="text-center text-gray-400 text-sm mb-3">or</div>
 
           {/* Form */}
-          <form className="flex flex-col gap-4">
+          <form onSubmit={handleSignUp} className="flex flex-col gap-4">
             <div>
               <label htmlFor="name" className="text-sm text-gray-600">
                 Name
@@ -40,6 +96,10 @@ export default function SignUp() {
               <input
                 type="text"
                 id="name"
+                name="name"
+                autoFocus
+                value={signupInfo.name}
+                onChange={handleChange}
                 placeholder="Enter your name"
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm sm:text-base"
               />
@@ -51,7 +111,10 @@ export default function SignUp() {
               </label>
               <input
                 type="email"
+                name="email"
                 id="email"
+                value={signupInfo.email}
+                onChange={handleChange}
                 placeholder="Enter your email"
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm sm:text-base"
               />
@@ -64,6 +127,9 @@ export default function SignUp() {
               <input
                 type="password"
                 id="password"
+                name="password"
+                value={signupInfo.password}
+                onChange={handleChange}
                 placeholder="Enter your password"
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm sm:text-base"
               />
@@ -113,6 +179,7 @@ export default function SignUp() {
           agency, or part of a team.
         </p>
       </div>
+      <ToastContainer />
     </div>
   );
 }

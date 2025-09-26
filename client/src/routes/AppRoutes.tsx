@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import SignUpPage from "../pages/SignUpPage";
 import LandingPage from "../pages/LandingPage";
 import Login from "../pages/LoginPage";
@@ -8,21 +9,80 @@ import Projects from "../pages/Projects";
 import TasksPage from "../pages/TasksPage";
 import ProjectDetails from "../components/projects/ProjectDetails";
 import Trash from "../pages/Trash";
+import PublicRoutes from "./PublicRoutes";
+import PrivateRoutes from "./PrivateRoutes";
+
 export default function AppRoutes() {
   return (
     <Routes>
       {/* public routes */}
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/register" element={<SignUpPage />} />
-      <Route path="/login" element={<Login />} />
+      <Route
+        path="/"
+        element={
+          <PublicRoutes>
+            <LandingPage />
+          </PublicRoutes>
+        }
+      />
+      <Route
+        path="/register"
+        element={
+          <PublicRoutes>
+            <SignUpPage />
+          </PublicRoutes>
+        }
+      />
+      <Route
+        path="/login"
+        element={
+          <PublicRoutes>
+            <Login />
+          </PublicRoutes>
+        }
+      />
 
       {/* private routes */}
       <Route element={<DashboardLayout />}>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/projects" element={<Projects />} />
-        <Route path="/tasks" element={<TasksPage />} />
-        <Route path="/projects/:id" element={<ProjectDetails />} />
-        <Route path="/trash" element={<Trash />} />
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoutes>
+              <Dashboard />
+            </PrivateRoutes>
+          }
+        />
+        <Route
+          path="/projects"
+          element={
+            <PrivateRoutes>
+              <Projects />
+            </PrivateRoutes>
+          }
+        />
+        <Route
+          path="/tasks"
+          element={
+            <PrivateRoutes>
+              <TasksPage />
+            </PrivateRoutes>
+          }
+        />
+        <Route
+          path="/projects/:id"
+          element={
+            <PrivateRoutes>
+              <ProjectDetails />
+            </PrivateRoutes>
+          }
+        />
+        <Route
+          path="/trash"
+          element={
+            <PrivateRoutes>
+              <Trash />
+            </PrivateRoutes>
+          }
+        />
       </Route>
     </Routes>
   );

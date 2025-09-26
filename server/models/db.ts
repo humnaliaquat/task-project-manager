@@ -9,8 +9,8 @@ if (!mongo_url) {
 mongoose
   .connect(mongo_url)
   .then(() => {
-    console.log(" Mongoose connected...");
+    console.log("✅ Mongoose connected...");
   })
   .catch((error: unknown) => {
-    console.error(" MongoDB connection error:", error);
+    console.error("❌ MongoDB connection error:", error);
   });

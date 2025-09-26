@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+
 import {
   LayoutDashboard,
   Folder,
   ListTodo,
-  Calendar,
-  BarChart2,
   Settings,
   Trash,
   LogOut,
@@ -16,6 +16,9 @@ import {
 export default function Sidebar() {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
   const collection = [
     { path: "/dashboard", name: "Dashboard", icon: LayoutDashboard },
@@ -81,21 +84,35 @@ export default function Sidebar() {
               General
             </p>
             <nav className="flex flex-col gap-1">
-              {general.map((item, index) => (
-                <Link
-                  key={index}
-                  to={item.path}
-                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    location.pathname === item.path
-                      ? "bg-violet-100 text-violet-600"
-                      : "text-gray-600 hover:bg-gray-100"
-                  }`}
-                  onClick={() => setIsOpen(false)}
-                >
-                  <item.icon className="h-5 w-5 mr-3" />
-                  {item.name}
-                </Link>
-              ))}
+              {general.map((item, index) =>
+                item.name === "Logout" ? (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      logout();
+                      navigate("/login");
+                    }}
+                    className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer text-left"
+                  >
+                    <item.icon className="h-5 w-5 mr-3" />
+                    {item.name}
+                  </button>
+                ) : (
+                  <Link
+                    key={index}
+                    to={item.path}
+                    className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      location.pathname === item.path
+                        ? "bg-violet-100 text-violet-600"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <item.icon className="h-5 w-5 mr-3" />
+                    {item.name}
+                  </Link>
+                )
+              )}
             </nav>
           </div>
         </div>
