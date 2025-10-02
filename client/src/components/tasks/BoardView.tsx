@@ -1,16 +1,25 @@
 import React from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { MoreHorizontal, Plus } from "lucide-react";
+import axios from "axios";
+import { handleError } from "../../utils/utils";
 
-export default function BoardView() {
-  const [tasks, setTasks] = React.useState([
-    { id: "1", title: "Design Homepage", status: "todo" },
-    { id: "2", title: "Fix Navbar Bug", status: "todo" },
-    { id: "3", title: "Build API Routes", status: "inprogress" },
-    { id: "4", title: "UI Review Meeting", status: "inprogress" },
-    { id: "5", title: "Deploy to Vercel", status: "completed" },
-  ]);
+type Task = {
+  _id: string;
+  title: string;
+  description?: string;
+  dueDate?: string;
+  priority?: string;
+  status: "todo" | "inprogress" | "completed";
+};
 
+type Props = {
+  tasks: Task[];
+  loading: boolean;
+  setTasks: React.Dispatch<React.SetStateAction<Task[]>>; // <--- get from parent
+};
+
+export default function BoardView({ tasks, loading, setTasks }: Props) {
   const columns = [
     {
       id: "todo",
@@ -33,49 +42,59 @@ export default function BoardView() {
   ];
 
   // Helper: reorder list
-  const reorder = (list: any[], startIndex: number, endIndex: number) => {
+  const reorder = (list: Task[], startIndex: number, endIndex: number) => {
     const result = Array.from(list);
     const [removed] = result.splice(startIndex, 1);
     result.splice(endIndex, 0, removed);
     return result;
   };
 
-  const onDragEnd = (result: any) => {
+  const onDragEnd = async (result: any) => {
     if (!result.destination) return;
 
     const { source, destination, draggableId } = result;
 
     setTasks((prev) => {
-      // Tasks in source column
       const sourceTasks = prev.filter(
         (task) => task.status === source.droppableId
       );
-      // Tasks in destination column
-      const destTasks = prev.filter(
-        (task) => task.status === destination.droppableId
-      );
 
-      // Moving within the same column (reorder only)
+      // Moving within the same column
       if (source.droppableId === destination.droppableId) {
         const reordered = reorder(sourceTasks, source.index, destination.index);
-
-        // return tasks with updated order for that column
-        return prev.map((task) => {
-          if (task.status !== source.droppableId) return task;
-          return reordered.find((t) => t.id === task.id)!;
-        });
+        return prev.map((task) =>
+          task.status !== source.droppableId
+            ? task
+            : reordered.find((t) => t._id === task._id) || task
+        );
       }
 
       // Moving across columns
-      const movingTask = prev.find((t) => t.id === draggableId)!;
+      const newStatus = destination.droppableId as Task["status"];
 
-      return prev.map((task) =>
-        task.id === draggableId
-          ? { ...task, status: destination.droppableId }
-          : task
+      // Optimistic update
+      const updatedTasks = prev.map((task) =>
+        task._id === draggableId ? { ...task, status: newStatus } : task
       );
+
+      // Persist to backend
+      axios
+        .patch(`http://localhost:3000/tasks/${draggableId}`, {
+          status: newStatus,
+        })
+        .catch((err) => {
+          handleError(err.message || "Failed to update task status");
+          // ❌ revert back if error
+          setTasks(prev);
+        });
+
+      return updatedTasks;
     });
   };
+
+  if (loading) {
+    return <p className="text-center py-6">Loading tasks...</p>;
+  }
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
@@ -92,7 +111,6 @@ export default function BoardView() {
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <span className={`w-3 h-3 rounded-full ${col.dot}`}></span>
-
                   <h2 className="font-semibold text-gray-800">{col.title}</h2>
                 </div>
                 <button className="text-gray-400 cursor-pointer hover:text-gray-600">
@@ -106,13 +124,13 @@ export default function BoardView() {
                   <div
                     {...provided.droppableProps}
                     ref={provided.innerRef}
-                    className="flex flex-col gap-3 flex-1 min-h-[100px]"
+                    className="flex flex-col gap-3 flex-1 min-h-[100px] max-h-[600px] overflow-y-auto"
                   >
                     {filteredTasks.length > 0 ? (
                       filteredTasks.map((task, index) => (
                         <Draggable
-                          key={task.id}
-                          draggableId={task.id}
+                          key={task._id}
+                          draggableId={task._id.toString()}
                           index={index}
                         >
                           {(provided, snapshot) => (
@@ -137,18 +155,35 @@ export default function BoardView() {
                                     type="checkbox"
                                     className="accent-violet-600 cursor-pointer"
                                   />
-                                  <button className="text-gray-400 hover:text-gray-600 cursor-pointer ">
+                                  <button className="text-gray-400 hover:text-gray-600 cursor-pointer">
                                     <MoreHorizontal size={16} />
                                   </button>
                                 </div>
                               </div>
                               <p className="text-xs text-gray-500 mb-2">
-                                Brief description here...
+                                {task.description || "No description"}
                               </p>
                               <div className="flex justify-between text-xs text-gray-500">
-                                <p>Due: 20 May</p>
-                                <p className="text-red-500 font-medium">
-                                  High Priority
+                                <p>
+                                  {task.dueDate
+                                    ? new Date(task.dueDate).toLocaleDateString(
+                                        "en-US",
+                                        {
+                                          month: "long",
+                                          day: "numeric",
+                                          year: "numeric",
+                                        }
+                                      )
+                                    : "No due date"}
+                                </p>
+                                <p
+                                  className={`font-medium ${
+                                    task.priority === "High"
+                                      ? "text-red-500"
+                                      : "text-gray-500"
+                                  }`}
+                                >
+                                  {task.priority || "—"}
                                 </p>
                               </div>
                             </div>
@@ -166,7 +201,7 @@ export default function BoardView() {
               </Droppable>
 
               {/* Add Task Button */}
-              <button className="mt-4 w-full flex items-center justify-center gap-2 px-3 py-2 border border-dashed border-violet-400  cursor-pointer text-violet-600 rounded-lg hover:bg-violet-50 transition">
+              <button className="mt-4 w-full flex items-center justify-center gap-2 px-3 py-2 border border-dashed border-violet-400 cursor-pointer text-violet-600 rounded-lg hover:bg-violet-50 transition">
                 <Plus size={16} />
                 <span className="text-sm font-medium">Add Task</span>
               </button>

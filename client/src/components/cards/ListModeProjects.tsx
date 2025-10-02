@@ -1,248 +1,394 @@
-// keep your imports same
-import React, { useState } from "react";
-import { Trash2 } from "lucide-react";
-import { MoreHorizontal } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
+import ProjectDetails from "../projects/ProjectDetails";
+import { handleError } from "../../utils/utils";
+import { MoreHorizontal, X } from "lucide-react";
+import axios from "axios";
+import ActionDropdown from "../projects/dropdown/ActionDropdown";
+import AddProjectModal from "../projects/AddProjectModal";
 
 type Project = {
-  id: number;
-  name: string;
-  incharge: string; // replaced start with incharge
-  deadline: string;
-  status: "Completed" | "In Progress" | "Pending";
-  totaltasks: number;
+  _id: string;
+  title: string;
+  status?: string;
+  dueDate?: string;
+  inChargeName?: string;
+  isTrashed?: boolean;
 };
 
 export default function ListModeProjects() {
-  const projects: Project[] = [
-    {
-      id: 1,
-      name: "Project 1",
-      incharge: "Ali Khan",
-      deadline: "20 June 2025",
-      status: "Pending",
-      totaltasks: 10,
-    },
-    {
-      id: 2,
-      name: "Project 2",
-      incharge: "Sara Ahmed",
-      deadline: "25 June 2025",
-      status: "In Progress",
-      totaltasks: 8,
-    },
-    {
-      id: 3,
-      name: "Project 3",
-      incharge: "Hamza Malik",
-      deadline: "18 June 2025",
-      status: "Completed",
-      totaltasks: 12,
-    },
-    {
-      id: 4,
-      name: "Project 4",
-      incharge: "Ayesha Khan",
-      deadline: "30 June 2025",
-      status: "In Progress",
-      totaltasks: 14,
-    },
-    {
-      id: 5,
-      name: "Project 5",
-      incharge: "Bilal Ahmed",
-      deadline: "05 July 2025",
-      status: "Pending",
-      totaltasks: 12,
-    },
-    {
-      id: 5,
-      name: "Project 5",
-      incharge: "Bilal Ahmed",
-      deadline: "05 July 2025",
-      status: "Pending",
-      totaltasks: 12,
-    },
-  ];
-
   const [currentPage, setCurrentPage] = useState(1);
-  const projectsPerPage = 12;
-  const totalPages = Math.ceil(projects.length / projectsPerPage);
+  const [isDropdownOpen, setIsDropdownOpen] = useState<string | null>(null);
+  const [isSmScreenDropdownOpen, setIsSmScreenDropdownOpen] = useState<
+    string | null
+  >(null);
+  const [loading, setLoading] = useState(true);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const projectsPerPage = 10;
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [editProject, setEditProject] = useState<Project | null>(null);
 
-  const startIndex = (currentPage - 1) * projectsPerPage;
-  const currentProjects = projects.slice(
-    startIndex,
-    startIndex + projectsPerPage
+  const indexOfLast = currentPage * projectsPerPage;
+  const indexOfFirst = indexOfLast - projectsPerPage;
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const smDropdownRef = useRef<HTMLDivElement | null>(null);
+  const currentProjects = projects.slice(indexOfFirst, indexOfLast);
+  const toggleDropdown = (id: string) => {
+    setIsDropdownOpen(isDropdownOpen === id ? null : id);
+  };
+  const toggleSmDropdown = (id: string) => {
+    setIsSmScreenDropdownOpen(isSmScreenDropdownOpen === id ? null : id);
+  };
+  const totalPages = Math.ceil(projects.length / projectsPerPage) || 1;
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
+    null
+  );
+  const [selectedSmProjectId, setSelectedSmProjectId] = useState<string | null>(
+    null
   );
 
-  const [selectedProjects, setSelectedProjects] = useState<number[]>([]);
-  const allSelected = selectedProjects.length === currentProjects.length;
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get("http://localhost:3000/projects");
+        setProjects(res.data.filter((p: Project) => !p.isTrashed));
+      } catch (error: any) {
+        handleError(error.message || "Something went wrong");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProjects();
+  }, []);
 
-  const toggleSelectAll = () => {
-    if (allSelected) {
-      setSelectedProjects([]);
-    } else {
-      setSelectedProjects(currentProjects.map((p) => p.id));
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
+        setIsDropdownOpen(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        smDropdownRef.current &&
+        !smDropdownRef.current.contains(e.target as Node)
+      ) {
+        setIsSmScreenDropdownOpen(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+  const onDeleteProject = async (projectId: string) => {
+    try {
+      await axios.put(`http://localhost:3000/projects/${projectId}/trash`);
+      setProjects((prev) => prev.filter((p) => p._id !== projectId));
+    } catch (err) {
+      console.error("Error moving to trash:", err);
     }
   };
 
-  const toggleSelectOne = (id: number) => {
-    setSelectedProjects((prev) =>
-      prev.includes(id) ? prev.filter((pid) => pid !== id) : [...prev, id]
-    );
-  };
-
-  const statusColors: Record<Project["status"], string> = {
-    Completed: "bg-green-100 text-green-700",
-    "In Progress": "bg-blue-100 text-blue-700",
-    Pending: "bg-yellow-100 text-yellow-700",
-  };
+  if (loading) {
+    return <p className="text-center mt-10">Loading projects...</p>;
+  }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-      {/* Desktop Table */}
-      <div className="hidden sm:block overflow-x-auto">
-        <table className="w-full border-collapse">
-          <thead className="sticky top-0 bg-violet-50">
-            <tr className="text-sm border-b border-gray-200">
-              <th className="py-3 px-4 text-left">
-                <input
-                  type="checkbox"
-                  className="accent-violet-600 cursor-pointer"
-                  checked={allSelected}
-                  onChange={toggleSelectAll}
-                />
-              </th>
-              <th className="py-3 px-4 text-center">Project Name</th>
-              <th className="py-3 px-4 text-center">Incharge</th>
-              <th className="py-3 px-4 text-center">Deadline</th>
-              <th className="py-3 px-4 text-center">Status</th>
-              <th className="py-3 px-4 text-center">Total Tasks</th>
-              <th className="py-3 px-4 text-center">Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {currentProjects.map((project) => (
-              <tr
-                key={project.id}
-                className={`text-sm hover:bg-violet-100 transition ${
-                  selectedProjects.includes(project.id)
-                    ? "bg-violet-50"
-                    : "odd:bg-white even:bg-violet-50"
-                }`}
-              >
-                <td className="py-3 px-4">
-                  <input
-                    type="checkbox"
-                    className="accent-violet-600 cursor-pointer"
-                    checked={selectedProjects.includes(project.id)}
-                    onChange={() => toggleSelectOne(project.id)}
-                  />
-                </td>
-                <td className="py-3 px-4 font-medium text-center">
-                  <Link
-                    to={`/projects/${project.id}`}
-                    className="hover:underline text-violet-600"
-                  >
-                    {project.name}
-                  </Link>
-                </td>
-                <td className="px-4 text-center">{project.incharge}</td>
-                <td className="px-4 text-center">{project.deadline}</td>
-                <td className="px-4 text-center">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      statusColors[project.status]
+    <div className="w-full">
+      {projects.length === 0 ? (
+        <div className="text-center text-gray-600">
+          <p className="text-lg font-medium">No projects yet</p>
+          <p className="text-sm mt-2">
+            Start by adding a new project to see it here.
+          </p>
+        </div>
+      ) : (
+        <>
+          {/* Desktop Table */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-gray-100 text-left text-sm text-gray-600">
+                  <th className="px-4 py-2">Project</th>
+                  <th className="px-4 py-2">Status</th>
+                  <th className="px-4 py-2">Due Date</th>
+                  <th className="px-4 py-2">In Charge</th>
+                  <th className="px-4 py-2">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentProjects.map((project, idx) => (
+                  <tr
+                    key={project._id}
+                    className={`border-b border-gray-200 ${
+                      idx % 2 === 1 ? "bg-violet-50" : ""
                     }`}
                   >
-                    {project.status}
-                  </span>
-                </td>
-                <td className="px-4 text-center">{project.totaltasks}</td>
-                <td className="px-4 text-center">
-                  <div className="flex justify-center items-center gap-2">
-                    <button className="text-red-500 hover:text-red-700 cursor-pointer">
-                      <Trash2 size={18} />
-                    </button>
-                    <button className="text-gray-600 hover:text-gray-800 cursor-pointer">
-                      <MoreHorizontal size={18} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                    <td className="py-3 px-4 font-medium text-left">
+                      <button
+                        onClick={() => setSelectedProjectId(project._id)}
+                        className="hover:underline cursor-pointer text-violet-600"
+                      >
+                        {project.title}
+                      </button>
+                      <ProjectDetails
+                        projectId={selectedProjectId}
+                        onClose={() => setSelectedProjectId(null)}
+                      />
+                    </td>
+                    <td className="px-4 py-2">{project.status || "N/A"}</td>
+                    <td className="px-4 py-2">
+                      {project.dueDate
+                        ? new Date(project.dueDate).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "long",
+                              day: "numeric",
+                              year: "numeric",
+                            }
+                          )
+                        : "N/A"}
+                    </td>
+                    <td className="px-4 py-2">
+                      {project.inChargeName || "N/A"}
+                    </td>
+                    <td className="px-4 py-2 text-left">
+                      <div className="relative">
+                        <button className="cursor-pointer flex items-center justify-center">
+                          <MoreHorizontal
+                            size={18}
+                            className="text-gray-600 hover:text-gray-700"
+                            onClick={() => toggleDropdown(project._id)}
+                          />
+                        </button>
+                        {isDropdownOpen == project._id && (
+                          <div
+                            className="absolute top-4 z-50 bg-white right-16"
+                            ref={dropdownRef}
+                          >
+                            <ActionDropdown
+                              onViewDetails={() =>
+                                setSelectedProjectId(project._id)
+                              }
+                              onEditProject={() => {
+                                setEditProject(project);
+                                setIsProjectModalOpen(true);
+                              }}
+                              onAddTask={() =>
+                                console.log("TODO: open Add Task modal")
+                              }
+                              onDeleteProject={() =>
+                                onDeleteProject(project._id)
+                              }
+                            />
+                          </div>
+                        )}
+                        {/* Project Modal (New/Edit) */}
+                        {isProjectModalOpen && (
+                          <div className="fixed inset-0 bg-black/10 flex items-center justify-center z-50">
+                            <div className="relative bg-white p-6 rounded-xl shadow-lg w-[90%] max-w-md">
+                              {/* Close Button inside modal */}
+                              <button
+                                onClick={() => {
+                                  setIsProjectModalOpen(false);
+                                  setEditProject(null);
+                                }}
+                                className="absolute -top-2  cursor-pointer -right-2 bg-violet-200 rounded-full w-8 h-8 flex items-center justify-center text-gray-700 hover:bg-gray-300"
+                              >
+                                <X size={18} />
+                              </button>
 
-      {/* Mobile Card View */}
-      <div className="sm:hidden  ">
-        {currentProjects.map((project) => (
-          <div
-            key={project.id}
-            className="border-b border-gray-300  p-4  bg-white"
-          >
-            <div className="flex justify-between items-center">
-              <Link
-                to={`/projects/${project.id}`}
-                className="font-semibold text-violet-600 hover:underline"
-              >
-                {project.name}
-              </Link>
-              <button className="text-red-500 hover:text-red-700 cursor-pointer">
-                <Trash2 size={18} />
-              </button>
-            </div>
-            <p className="text-sm text-gray-600 mt-1 mb-2">
-              <span className="font-medium">Incharge:</span> {project.incharge}
-            </p>
-            <p className="text-sm text-gray-600  mb-2">
-              <span className="font-medium">Deadline:</span> {project.deadline}
-            </p>
-            <p className="text-sm mt-1 text-gray-600 flex gap-1  mb-2">
-              Status:
-              <span
-                className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                  statusColors[project.status]
-                }`}
-              >
-                {project.status}
-              </span>
-            </p>
-            <p className="text-sm text-gray-600 mt-1">
-              <span className="font-medium">Total Tasks:</span>{" "}
-              {project.totaltasks}
-            </p>
+                              <AddProjectModal
+                                initialProject={editProject || undefined}
+                                onClose={() => {
+                                  setIsProjectModalOpen(false);
+                                  setEditProject(null);
+                                }}
+                                onProjectAdded={(newProject) => {
+                                  if (editProject) {
+                                    setProjects((prev) =>
+                                      prev.map((p) =>
+                                        p._id === newProject._id
+                                          ? newProject
+                                          : p
+                                      )
+                                    );
+                                  } else {
+                                    setProjects((prev) => [
+                                      newProject,
+                                      ...prev,
+                                    ]);
+                                  }
+                                  setIsProjectModalOpen(false);
+                                  setEditProject(null);
+                                }}
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        ))}
-      </div>
+
+          {/* Mobile 2-Column Layout */}
+          <div className="md:hidden  mt-4">
+            {currentProjects.map((project) => (
+              <div
+                key={project._id}
+                className="grid grid-cols-2 gap-4 border border-b-0 border-gray-200 p-4 bg-white shadow-sm"
+              >
+                {/* Left col - Project Name */}
+                <div className="flex items-center border-r border-gray-200">
+                  <button
+                    onClick={() => setSelectedProjectId(project._id)}
+                    className="font-medium text-violet-600 cursor-pointer hover:underline"
+                  >
+                    {project.title}
+                  </button>
+                </div>
+                <ProjectDetails
+                  projectId={selectedSmProjectId}
+                  onClose={() => setSelectedSmProjectId(null)}
+                />
+
+                {/* Right col - Other info */}
+                <div className="space-y-1 text-sm text-gray-600">
+                  <p>
+                    <span className="font-semibold">Status: </span>
+                    {project.status || "N/A"}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Due: </span>
+                    {project.dueDate
+                      ? new Date(project.dueDate).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })
+                      : "N/A"}
+                  </p>
+                  <p>
+                    <span className="font-semibold">In Charge: </span>
+                    {project.inChargeName || "N/A"}
+                  </p>
+                  <div className="relative">
+                    <button onClick={() => toggleSmDropdown(project._id)}>
+                      <MoreHorizontal
+                        size={18}
+                        className="text-gray-600 cursor-pointer mt-1"
+                      />
+                    </button>
+                    {isSmScreenDropdownOpen == project._id && (
+                      <div
+                        className="absolute top-6 z-50 bg-white left-0"
+                        ref={smDropdownRef}
+                      >
+                        <ActionDropdown
+                          onViewDetails={() =>
+                            setSelectedSmProjectId(project._id)
+                          }
+                          onEditProject={() => {
+                            setEditProject(project);
+                            setIsOpen(true);
+                          }}
+                          onAddTask={() =>
+                            console.log("TODO: open Add Task modal")
+                          }
+                          onDeleteProject={() =>
+                            console.log("Delete project", project._id)
+                          }
+                        />
+                      </div>
+                    )}
+                    {/* Project Modal (New/Edit) */}
+                    {isOpen && (
+                      <div className="fixed inset-0 bg-black/10 flex items-center justify-center z-50">
+                        <div className="relative bg-white p-6 rounded-xl shadow-lg w-[90%] max-w-md">
+                          {/* Close Button inside modal */}
+                          <button
+                            onClick={() => {
+                              setIsOpen(false);
+                              setEditProject(null);
+                            }}
+                            className="absolute -top-2  cursor-pointer -right-2 bg-violet-200 rounded-full w-8 h-8 flex items-center justify-center text-gray-700 hover:bg-gray-300"
+                          >
+                            <X size={18} />
+                          </button>
+
+                          <AddProjectModal
+                            initialProject={editProject || undefined}
+                            onClose={() => {
+                              setIsOpen(false);
+                              setEditProject(null);
+                            }}
+                            onProjectAdded={(newProject) => {
+                              if (editProject) {
+                                setProjects((prev) =>
+                                  prev.map((p) =>
+                                    p._id === newProject._id ? newProject : p
+                                  )
+                                );
+                              } else {
+                                setProjects((prev) => [newProject, ...prev]);
+                              }
+                              setIsOpen(false);
+                              setEditProject(null);
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
       {/* Pagination */}
-      <footer className="flex justify-between items-center mt-4 px-4 py-2 text-sm text-gray-600">
+      <footer className="flex justify-between items-center mt-6 text-sm text-gray-600">
         <button
           onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
           disabled={currentPage === 1}
-          className="px-3 py-1 border rounded-lg disabled:opacity-50 border-gray-300 cursor-pointer "
+          className="px-3 py-1 border border-gray-300 cursor-pointer rounded-lg disabled:opacity-50"
         >
           Prev
         </button>
 
-        <div className="flex gap-2">
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
-            <button
-              key={num}
-              onClick={() => setCurrentPage(num)}
-              className={`px-3 py-1 rounded-lg border cursor-pointer ${
-                num === currentPage
-                  ? "bg-violet-500 text-white border-violet-500"
-                  : "hover:bg-gray-100 border-gray-300 cursor-pointer "
-              }`}
-            >
-              {num}
-            </button>
-          ))}
-        </div>
+        {projects.length > 0 && (
+          <div className="flex gap-2">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
+              <button
+                key={num}
+                onClick={() => setCurrentPage(num)}
+                className={`px-3 py-1 rounded-lg border border-gray-300 cursor-pointer ${
+                  num === currentPage
+                    ? "bg-violet-500 text-white border-violet-500"
+                    : "hover:bg-gray-100"
+                }`}
+              >
+                {num}
+              </button>
+            ))}
+          </div>
+        )}
 
         <button
           onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}

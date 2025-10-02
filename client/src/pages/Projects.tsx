@@ -1,5 +1,3 @@
-// Projects.tsx
-import React from "react";
 import DashboardHeader from "../components/layout/DashboardHeader";
 
 import ProjectCards from "../components/cards/ProjectCards";

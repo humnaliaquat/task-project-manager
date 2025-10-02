@@ -1,8 +1,17 @@
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Search, List, LayoutGrid, Plus, X } from "lucide-react";
 import BoardView from "./BoardView";
 import ListView from "./ListView";
 import AddNewTask from "./AddNewTask";
+import axios from "axios";
+type Task = {
+  _id: string;
+  title: string;
+  description?: string;
+  dueDate?: string;
+  priority?: string;
+  status: "todo" | "inprogress" | "completed";
+};
 export default function ViewsCombined() {
   const [isOpen, setIsOpen] = useState(false);
   const params =
@@ -12,6 +21,8 @@ export default function ViewsCombined() {
   const [viewMode, setViewMode] = useState<"board" | "list">(
     (params.get("view") as "board" | "list") || "board"
   );
+  const [tasks, setTasks] = React.useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const handleViewChange = (mode: "board" | "list") => {
     setViewMode(mode);
     if (typeof window !== "undefined") {
@@ -20,6 +31,42 @@ export default function ViewsCombined() {
       window.history.pushState({}, "", url);
     }
   };
+  const mapStatus = (status: string): Task["status"] => {
+    switch (status.toLowerCase()) {
+      case "to do":
+      case "todo":
+        return "todo";
+      case "in progress":
+      case "inprogress":
+        return "inprogress";
+      case "completed":
+        return "completed";
+      default:
+        return "todo"; // fallback
+    }
+  };
+
+  const fetchTasks = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get("http://localhost:3000/tasks");
+      const normalized = res.data.map((task: any) => ({
+        ...task,
+        status: mapStatus(task.status),
+      }));
+      setTasks(normalized);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ Fetch on mount
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
   return (
     <div className="p-4  rounded-2xl flex flex-col w-full bg-white border border-gray-200 ">
       <header className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-4">
@@ -85,14 +132,23 @@ export default function ViewsCombined() {
                 </button>
 
                 {/* Your Form */}
-                <AddNewTask onClose={() => setIsOpen(false)} />
+                <AddNewTask
+                  onClose={() => {
+                    setIsOpen(false);
+                    fetchTasks();
+                  }}
+                />
               </div>
             </div>
           )}
         </div>
       </header>
       <main className="overflow-x-auto">
-        {viewMode === "board" ? <BoardView /> : <ListView />}
+        {viewMode === "board" ? (
+          <BoardView tasks={tasks} loading={loading} setTasks={setTasks} />
+        ) : (
+          <ListView tasks={tasks} loading={loading} />
+        )}
       </main>
     </div>
   );

@@ -6,6 +6,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import AuthRouter from "./routes/AuthRouter";
 import ProjectsRoutes from "./routes/ProjectsRoutes"
+import TasksRoutes from "./routes/TasksRoutes"
 
 // DB connection
 import "./models/db";
@@ -19,7 +20,10 @@ app.use(bodyParser.json());
 
 // Use Auth routes
 app.use("/auth", AuthRouter);
+//Project routes
 app.use("/projects",ProjectsRoutes );
+//task routes
+app.use("/tasks", TasksRoutes);
 
 // ✅ Default home route
 app.get("/", (req: Request, res: Response) => {

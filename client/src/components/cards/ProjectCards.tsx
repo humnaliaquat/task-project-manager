@@ -1,8 +1,10 @@
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Search, List, LayoutGrid, X } from "lucide-react";
 import CardsModeProjects from "./CardsModeProjects";
 import ListModeProjects from "./ListModeProjects";
 import AddProjectModal from "../projects/AddProjectModal";
+import axios from "axios";
+import { handleError } from "../../utils/utils";
 
 export default function ProjectCards() {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,7 +25,22 @@ export default function ProjectCards() {
       window.history.pushState({}, "", url);
     }
   };
-
+  const [projects, setProjects] = React.useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const fetchProjects = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get("http://localhost:3000/projects");
+      setProjects(res.data);
+    } catch (error: any) {
+      handleError(error.message || "Failed to fetch projects");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchProjects();
+  }, []);
   return (
     <div className="p-4 mt-2 rounded-2xl flex flex-col w-full bg-white border border-gray-200 ">
       {/* Header with search + buttons */}
@@ -86,7 +103,11 @@ export default function ProjectCards() {
                 </button>
 
                 {/* Your Form */}
-                <AddProjectModal onClose={() => setIsOpen(false)} />
+                <AddProjectModal
+                  onClose={() => setIsOpen(false)}
+                  onProjectAdded={fetchProjects}
+                  initialProject={{}}
+                />
               </div>
             </div>
           )}

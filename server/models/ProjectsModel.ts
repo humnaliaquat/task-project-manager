@@ -11,6 +11,14 @@ const ProjectsSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    isTrashed: { type: Boolean, default: false },
+     priority: {
+      type: String,
+      enum: ["low", "medium", "high"], 
+      lowercase: true, 
+      trim: true, 
+      default: "medium", 
+    },
     inChargeName: {
       type: String,
       required: true,
@@ -23,13 +31,18 @@ const ProjectsSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Pending", "In Progress", "Completed"],
-      default: "Pending",
+      enum: ["To Do", "In Progress", "Completed"],
+      default: "To Do",
     },
     dueDate: {
       type: Date,
     },
-    
+    progress: {
+  type: Number,
+  default: 0, 
+  min: 0,
+  max: 100
+},  
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

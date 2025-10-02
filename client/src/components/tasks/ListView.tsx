@@ -2,11 +2,17 @@ import { useState } from "react";
 import { ChevronDown, ArrowUpRight, MoreHorizontal } from "lucide-react";
 
 type Task = {
-  id: number;
-  name: string;
+  _id: string;
+  title: string;
   description: string;
   dueDate: string;
-  priority: "High" | "Medium" | "Low";
+  priority?: "high" | "medium" | "low";
+  status: "todo" | "inprogress" | "completed";
+};
+
+type ListViewProps = {
+  tasks: Task[];
+  loading: boolean;
 };
 
 type ColumnProps = {
@@ -63,7 +69,6 @@ function TaskColumn({ title, tasks }: ColumnProps) {
                   />
                 </th>
                 <th className="p-2 text-center">Task Name</th>
-                <th className="p-2 text-center">Description</th>
                 <th className="p-2 text-center">Due Date</th>
                 <th className="p-2 text-center">Priority</th>
                 <th className="p-2 text-center">Action</th>
@@ -72,7 +77,7 @@ function TaskColumn({ title, tasks }: ColumnProps) {
             <tbody>
               {tasks.map((task, i) => (
                 <tr
-                  key={task.id}
+                  key={task._id}
                   className={`text-center ${
                     i % 2 === 0 ? "bg-white" : "bg-violet-50"
                   } ${
@@ -85,20 +90,32 @@ function TaskColumn({ title, tasks }: ColumnProps) {
                       className="accent-violet-600 cursor-pointer"
                     />
                   </td>
-                  <td className="p-2">{task.name}</td>
-                  <td className="p-2 text-gray-500">{task.description}</td>
-                  <td className="p-2">{task.dueDate}</td>
+                  <td className="p-2">{task.title}</td>
+
+                  <td className="p-2">
+                    {task.dueDate
+                      ? new Date(task.dueDate).toLocaleDateString("en-US", {
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric",
+                        })
+                      : "No due date"}
+                  </td>
                   <td
                     className={`p-2 font-medium ${
-                      task.priority === "High"
+                      task.priority === "high"
                         ? "text-red-600"
-                        : task.priority === "Medium"
+                        : task.priority === "medium"
                         ? "text-yellow-600"
                         : "text-green-600"
                     }`}
                   >
-                    {task.priority}
+                    {task.priority
+                      ? task.priority.charAt(0).toUpperCase() +
+                        task.priority.slice(1)
+                      : "N/A"}
                   </td>
+
                   <td className="p-2">
                     <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
                       <MoreHorizontal size={16} />
@@ -114,36 +131,25 @@ function TaskColumn({ title, tasks }: ColumnProps) {
   );
 }
 
-export default function ListView() {
-  const tasks: Task[] = [
-    {
-      id: 1,
-      name: "Task 1",
-      description: "Lorem ipsum dolor...",
-      dueDate: "12 June",
-      priority: "High",
-    },
-    {
-      id: 2,
-      name: "Task 2",
-      description: "Consectetur adipiscing...",
-      dueDate: "15 June",
-      priority: "Medium",
-    },
-    {
-      id: 3,
-      name: "Task 3",
-      description: "Sed do eiusmod...",
-      dueDate: "20 June",
-      priority: "Low",
-    },
-  ];
+export default function ListView({ tasks, loading }: ListViewProps) {
+  if (loading) return <p className="text-center">Loading tasks...</p>;
 
   return (
     <div className="flex flex-col gap-6">
-      <TaskColumn title="To Do" tasks={tasks} />
-      <TaskColumn title="In Progress" tasks={tasks} />
-      <TaskColumn title="Completed" tasks={tasks} />
+      <div className="flex flex-col gap-6">
+        <TaskColumn
+          title="To Do"
+          tasks={tasks.filter((t) => t.status === "todo")}
+        />
+        <TaskColumn
+          title="In Progress"
+          tasks={tasks.filter((t) => t.status === "inprogress")}
+        />
+        <TaskColumn
+          title="Completed"
+          tasks={tasks.filter((t) => t.status === "completed")}
+        />
+      </div>
     </div>
   );
 }
