@@ -8,7 +8,7 @@ export default function Notepad() {
     <div className="flex flex-col border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 rounded-xl ">
       {/* Header */}
       <header className="border-b border-gray-200 dark:border-gray-700 px-4 py-3">
-        <p className="text-xl font-medium text-slate-800 ">Private Notepad</p>
+        <p className="text-lg font-medium text-slate-800 ">Private Notepad</p>
       </header>
 
       {/* Main Text Area */}

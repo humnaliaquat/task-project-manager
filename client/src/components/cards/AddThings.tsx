@@ -5,6 +5,7 @@ import {
   FolderKanban,
   CheckSquare,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function AddThings() {
   const actions = [
@@ -12,11 +13,13 @@ export default function AddThings() {
       name: "Create Task",
       detail: "Add tasks to your projects",
       icon: <ClipboardList className="h-6 w-6 text-violet-500" />,
+      path: "/tasks",
     },
     {
       name: "Add Project",
       detail: "Start a new project",
       icon: <PlusSquare className="h-6 w-6 text-violet-500" />,
+      path: "/projects",
     },
   ];
 
@@ -37,7 +40,8 @@ export default function AddThings() {
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 rounded-xl">
       {/* Quick Actions */}
       {actions.map((item, index) => (
-        <div
+        <Link
+          to={item.path}
           key={index}
           className="p-2 flex items-center gap-4 border border-gray-200 rounded-xl bg-white s cursor-pointer"
         >
@@ -51,7 +55,7 @@ export default function AddThings() {
             <p className="text-base font-medium ">{item.name}</p>
             <p className="text-sm  text-gray-600">{item.detail}</p>
           </div>
-        </div>
+        </Link>
       ))}
 
       {/* Stats */}

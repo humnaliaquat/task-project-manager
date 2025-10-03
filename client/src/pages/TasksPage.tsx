@@ -8,6 +8,7 @@ export default function TasksPage() {
       <DashboardHeader
         title="Tasks"
         subtitle="Create, track, and manage all your tasks easily"
+        showSearch={false}
       />
       <TasksOverview />
       <div className="flex w-full gap-4 p-4 pt-0 ">

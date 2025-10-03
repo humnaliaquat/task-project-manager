@@ -10,6 +10,7 @@ export default function Projects() {
       <DashboardHeader
         title="Projects"
         subtitle="Track and organize all your projects at one place"
+        showSearch={false}
       />
 
       {/* Overview Section */}

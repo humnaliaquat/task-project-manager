@@ -7,6 +7,7 @@ import bodyParser from "body-parser";
 import AuthRouter from "./routes/AuthRouter";
 import ProjectsRoutes from "./routes/ProjectsRoutes"
 import TasksRoutes from "./routes/TasksRoutes"
+import AssignedTasksRoutes from "./routes/AssignedTasks";
 
 // DB connection
 import "./models/db";
@@ -24,6 +25,8 @@ app.use("/auth", AuthRouter);
 app.use("/projects",ProjectsRoutes );
 //task routes
 app.use("/tasks", TasksRoutes);
+//Assigned Tasks routes
+app.use("/assigned",AssignedTasksRoutes )
 
 // ✅ Default home route
 app.get("/", (req: Request, res: Response) => {

@@ -102,7 +102,7 @@ export default function ProjectCards() {
                   <X size={18} />
                 </button>
 
-                {/* Your Form */}
+                {/*  Form */}
                 <AddProjectModal
                   onClose={() => setIsOpen(false)}
                   onProjectAdded={fetchProjects}

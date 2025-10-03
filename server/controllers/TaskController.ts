@@ -71,4 +71,19 @@ const UpdateAllTasks = async (req:Request, res: Response)=>{
     res.status(400).json({ error: err.message });
   }
 };
-export default { GetAllTasks, CreateTask, GetOneTask, UpdateTask, DeleteTask , UpdateAllTasks};
+
+export const getRecentTasks = async (req: Request, res: Response) => {
+  try {
+    const limit = parseInt(req.query.limit as string) || 4;
+
+    const recentTasks = await TasksModel.find()
+      .sort({ createdAt: -1 })
+      .limit(limit);
+
+    res.status(200).json(recentTasks);
+  } catch (error: any) {
+    res.status(500).json({ message: "Failed to fetch recent tasks", error: error.message });
+  }
+};
+
+export default { GetAllTasks, CreateTask, GetOneTask, UpdateTask, DeleteTask , UpdateAllTasks , getRecentTasks};

@@ -19,7 +19,7 @@ export default function WeeklyProjectsChart() {
   return (
     <div className="flex flex-col p-2 pl-4 bg-white rounded-xl border border-gray-200">
       {/* Title aligned to left */}
-      <p className="text-xl font-medium text-gray-800 dark:text-white mb-3 text-left">
+      <p className="text-lg font-medium text-gray-800 dark:text-white mb-3 text-left">
         Weekly Projects
       </p>
 

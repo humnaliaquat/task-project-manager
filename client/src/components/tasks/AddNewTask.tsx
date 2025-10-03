@@ -92,7 +92,8 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
         status: "to do",
         priority: "",
       });
-      setSelected(null);
+      setProjectSelected("Select Project");
+      setPriority(null);
       setStatus(null);
 
       if (onClose) onClose();
@@ -111,7 +112,7 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
       }
     };
     fetchProjects();
-  });
+  }, []);
 
   return (
     <form

@@ -17,6 +17,7 @@ const TasksSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
       default: "to do",
+       set: (val: string) => val.replace("inprogress", "in progress"),
     },
     priority: {
       type: String,

@@ -9,7 +9,7 @@ export default function RecentlyAdded() {
     <div className="flex flex-col border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 rounded-xl ">
       {/* Header */}
       <header className="border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex justify-between items-center">
-        <p className="text-xl font-medium text-slate-800 ">Recently Added</p>
+        <p className="text-lg font-medium text-slate-800 ">Recently Added</p>
         <p>See All Tasks</p>
       </header>
 
