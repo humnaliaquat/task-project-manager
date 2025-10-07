@@ -1,12 +1,9 @@
-import React from "react";
 import DashboardHeader from "../components/layout/DashboardHeader";
-import TasksOverview from "../components/cards/TasksOverview";
 import ProgressTrends from "../components/cards/PreogressTrends";
 import AssignedTasks from "../components/cards/AssignedTasks";
 import Notepad from "../components/cards/Notepad";
 import AddThings from "../components/cards/AddThings";
 import WeeklyProjectsChart from "../components/cards/WeeklyProjectsChart";
-import DashboardOverview from "../components/cards/DashboardOverview";
 import TasksCreatedToday from "../components/cards/TasksCreatedToday";
 
 export default function Dashboard() {
@@ -15,6 +12,7 @@ export default function Dashboard() {
       <DashboardHeader
         title="Dashboard"
         subtitle="Monitor all of your projects and tasks here"
+        showSearch={false}
       />
       <AddThings />
       {/* Responsive grid */}

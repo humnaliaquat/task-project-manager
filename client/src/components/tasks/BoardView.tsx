@@ -3,6 +3,7 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { MoreHorizontal, Plus } from "lucide-react";
 import axios from "axios";
 import { handleError } from "../../utils/utils";
+import { useAuth } from "../../context/AuthContext";
 
 type Task = {
   _id: string;
@@ -10,7 +11,7 @@ type Task = {
   description?: string;
   dueDate?: string;
   priority?: string;
-  status: "todo" | "inprogress" | "completed";
+  status: "todo" | "in progress" | "completed";
 };
 
 type Props = {
@@ -20,15 +21,16 @@ type Props = {
 };
 
 export default function BoardView({ tasks, loading, setTasks }: Props) {
+  const { user } = useAuth();
   const columns = [
     {
-      id: "todo",
+      id: "to do",
       title: "To Do",
       color: "border-l-violet-500",
       dot: "bg-violet-500",
     },
     {
-      id: "inprogress",
+      id: "in progress",
       title: "In Progress",
       color: "border-l-yellow-500",
       dot: "bg-yellow-500",
@@ -79,9 +81,15 @@ export default function BoardView({ tasks, loading, setTasks }: Props) {
 
       // Persist to backend
       axios
-        .patch(`http://localhost:3000/tasks/${draggableId}`, {
-          status: newStatus,
-        })
+        .patch(
+          `http://localhost:3000/tasks/${draggableId}`,
+          { status: newStatus },
+          {
+            headers: {
+              Authorization: `Bearer ${user?.token}`,
+            },
+          }
+        )
         .catch((err) => {
           handleError(err.message || "Failed to update task status");
           // ❌ revert back if error

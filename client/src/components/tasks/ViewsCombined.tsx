@@ -4,13 +4,14 @@ import BoardView from "./BoardView";
 import ListView from "./ListView";
 import AddNewTask from "./AddNewTask";
 import axios from "axios";
+
 type Task = {
   _id: string;
   title: string;
   description?: string;
   dueDate?: string;
   priority?: string;
-  status: "todo" | "inprogress" | "completed";
+  status: "to do" | "in progress" | "completed";
 };
 export default function ViewsCombined() {
   const [isOpen, setIsOpen] = useState(false);
@@ -34,22 +35,33 @@ export default function ViewsCombined() {
   const mapStatus = (status: string): Task["status"] => {
     switch (status.toLowerCase()) {
       case "to do":
-      case "todo":
-        return "todo";
+      case "to do":
+        return "to do";
       case "in progress":
-      case "inprogress":
-        return "inprogress";
+      case "in progress":
+        return "in progress";
       case "completed":
         return "completed";
       default:
-        return "todo"; // fallback
+        return "to do"; // fallback
     }
   };
+  const authUser = JSON.parse(localStorage.getItem("authUser") || "{}");
 
   const fetchTasks = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:3000/tasks");
+      console.log("🔑 Sending token:", authUser.token);
+
+      const res = await axios.get(
+        `http://localhost:3000/tasks?userId=${authUser.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${authUser.token}`,
+          },
+        }
+      );
+      console.log("Tasks fetched:", res.data);
       const normalized = res.data.map((task: any) => ({
         ...task,
         status: mapStatus(task.status),
@@ -133,9 +145,9 @@ export default function ViewsCombined() {
 
                 {/* Your Form */}
                 <AddNewTask
-                  onClose={() => {
-                    setIsOpen(false);
-                    fetchTasks();
+                  onClose={() => setIsOpen(false)}
+                  onTaskAdded={(newTask) => {
+                    setTasks((prev) => [...prev, newTask]);
                   }}
                 />
               </div>

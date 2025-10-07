@@ -5,12 +5,14 @@ import { handleError, handleSuccess } from "../../utils/utils";
 import ProjectDetails from "../projects/ProjectDetails";
 import ActionDropdown from "../projects/dropdown/ActionDropdown";
 import AddProjectModal from "../projects/AddProjectModal";
+import { useProjectStore } from "../../store/useProjectStore";
 type Project = {
   _id: string;
   title: string;
   status?: string;
   dueDate?: string;
   inChargeName?: string;
+  isTrashed?: boolean;
 };
 export default function CardsModeProjects() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,11 +37,26 @@ export default function CardsModeProjects() {
   const toggleDropdown = (id: string) => {
     setIsDropdownOpen(isDropdownOpen === id ? null : id);
   };
+  const onDeleteProject = async (projectId: string) => {
+    try {
+      const authUser = JSON.parse(localStorage.getItem("authUser") || "{}");
+      await axios.delete(`http://localhost:3000/projects/${projectId}`, {
+        headers: { Authorization: `Bearer ${authUser.token}` },
+      });
+      setProjects((prev) => prev.filter((p) => p._id !== projectId));
+    } catch (err) {
+      console.error("Error moving to trash:", err);
+    }
+  };
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/projects");
-        setProjects(res.data);
+        setLoading(true);
+        const authUser = JSON.parse(localStorage.getItem("authUser") || "{}");
+        const res = await axios.get("http://localhost:3000/projects", {
+          headers: { Authorization: `Bearer ${authUser.token}` },
+        });
+        setProjects(res.data.filter((p: Project) => !p.isTrashed));
       } catch (error: any) {
         handleError(error.message || "Something went wrong");
       } finally {
@@ -129,9 +146,7 @@ export default function CardsModeProjects() {
                           onAddTask={() =>
                             console.log("TODO: open Add Task modal")
                           }
-                          onDeleteProject={() =>
-                            console.log("Delete project", item._id)
-                          }
+                          onDeleteProject={() => onDeleteProject(item._id)}
                         />
                       </div>
                     )}

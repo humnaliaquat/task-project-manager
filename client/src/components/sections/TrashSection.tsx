@@ -84,7 +84,7 @@ export default function TrashSection() {
             placeholder={`Search ${activeTab}...`}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="border border-gray-300 pl-10 pr-3 py-2 rounded-xl w-full focus:ring-2 focus:ring-violet-400 outline-none text-sm"
+            className="border border-gray-300 pl-10 pr-3 py-2 rounded-xl w-full  focus:border-violet-500 outline-none text-sm"
           />
         </div>
 
@@ -117,7 +117,7 @@ export default function TrashSection() {
       </header>
 
       {/* Tabs */}
-      <div className="flex justify-between items-center border-b border-gray-200 px-4">
+      <div className="flex justify-between items-center border-b border-gray-200 ">
         <div className="flex gap-6">
           {["tasks", "projects"].map((tab) => (
             <button
@@ -127,7 +127,7 @@ export default function TrashSection() {
                 setSelectedItems([]);
                 setSearchQuery("");
               }}
-              className={`pb-2 font-medium ${
+              className={`pb-2 font-medium cursor-pointer ${
                 activeTab === tab
                   ? "text-violet-600 border-b-2 border-violet-600"
                   : "text-gray-500 hover:text-gray-700"
@@ -140,7 +140,7 @@ export default function TrashSection() {
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto bg-white rounded-xl border border-gray-200 shadow-sm m-4">
+      <div className="overflow-x-auto bg-white rounded-xl border border-gray-200 shadow-sm mt-4">
         {filteredData.length === 0 ? (
           <div className="text-center py-10 text-gray-500">
             <Trash2 size={40} className="mx-auto mb-3 text-gray-400" />

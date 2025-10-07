@@ -4,6 +4,7 @@ import CardsModeProjects from "./CardsModeProjects";
 import ListModeProjects from "./ListModeProjects";
 import AddProjectModal from "../projects/AddProjectModal";
 import axios from "axios";
+import { useProjectStore } from "../../store/useProjectStore";
 import { handleError } from "../../utils/utils";
 
 export default function ProjectCards() {
@@ -25,22 +26,12 @@ export default function ProjectCards() {
       window.history.pushState({}, "", url);
     }
   };
-  const [projects, setProjects] = React.useState<any[]>([]);
+  const { projects, fetchProjects } = useProjectStore();
   const [loading, setLoading] = useState(true);
-  const fetchProjects = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get("http://localhost:3000/projects");
-      setProjects(res.data);
-    } catch (error: any) {
-      handleError(error.message || "Failed to fetch projects");
-    } finally {
-      setLoading(false);
-    }
-  };
+
   useEffect(() => {
     fetchProjects();
-  }, []);
+  }, [fetchProjects]);
   return (
     <div className="p-4 mt-2 rounded-2xl flex flex-col w-full bg-white border border-gray-200 ">
       {/* Header with search + buttons */}

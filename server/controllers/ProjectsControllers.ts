@@ -2,21 +2,39 @@ import { Request, Response } from "express";
 import ProjectsModel from "../models/ProjectsModel";
 import mongoose from "mongoose";
 
+
 // Get all projects
 const GetProjects = async (req: Request, res: Response) => {
   try {
+    const userId = (req as any).user.id; 
+
     const projectsWithTaskCount = await ProjectsModel.aggregate([
+     
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(String(userId))
+,
+          isTrashed: false,
+        },
+      },
+     
       {
         $lookup: {
-          from: "tasks", // your MongoDB collection name for tasks
+          from: "tasks", 
           localField: "_id",
           foreignField: "projectId",
           as: "tasks",
         },
       },
+      
       {
         $addFields: {
           totaltasks: { $size: "$tasks" },
+        },
+      },
+      {
+        $project: {
+          tasks: 0,
         },
       },
     ]);
@@ -30,16 +48,28 @@ const GetProjects = async (req: Request, res: Response) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 // Create a project
 const CreateProject = async (req: Request, res: Response) => {
   try {
-    const project = new ProjectsModel(req.body);
+    
+    const userId = (req as any).user.id;
+
+    
+    const project = new ProjectsModel({
+      ...req.body,
+      userId, 
+    });
+
     await project.save();
+
     res.status(201).json(project);
   } catch (error: any) {
+    console.error("Error creating project:", error);
     res.status(400).json({ error: error.message });
   }
 };
+
 
 // Get one project by ID
 const GetOneProject = async (req: Request, res: Response) => {
@@ -58,7 +88,7 @@ const GetOneProject = async (req: Request, res: Response) => {
       },
       {
         $addFields: {
-          totaltasks: { $size: "$tasks" } 
+         $totalTasks: { $size: "$tasks" }, 
         }
       },
       {

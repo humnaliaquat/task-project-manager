@@ -1,28 +1,36 @@
 import { Request, Response } from "express";
 import TasksModel from "../models/TasksModel";
 console.log("✅ TasksRoutes loaded");
-const GetAllTasks = async (req: Request, res: Response) => {
+
+export const GetAllTasks = async (req: Request, res: Response) => {
   try {
-    const tasks = await TasksModel.find();
-    if (!tasks || tasks.length === 0) {
-      return res.status(404).json({ message: "No tasks found" });
-    }
-    res.status(200).json(tasks);
+    const userId = (req as any).user.id; // ✅ from token
+    const tasks = await TasksModel.find({ userId });
+    res.json(tasks);
   } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
 const CreateTask = async (req: Request, res: Response) => {
   console.log("📩 CreateTask called with body:", req.body);
   try {
-    const task = new TasksModel(req.body);
+    const userId = (req as any).user.id; 
+    
+console.log("🧠 userId from token:", userId);
+
+    const task = new TasksModel({
+      ...req.body,
+      userId, 
+    });
+
     await task.save();
     res.status(201).json(task);
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 const GetOneTask = async (req: Request, res: Response) => {
   try {
@@ -74,11 +82,12 @@ const UpdateAllTasks = async (req:Request, res: Response)=>{
 
 export const getRecentTasks = async (req: Request, res: Response) => {
   try {
-    const limit = parseInt(req.query.limit as string) || 4;
+    const userId = (req as any).user.id;
+const limit = parseInt(req.query.limit as string) || 4;
+const recentTasks = await TasksModel.find({ userId })
+  .sort({ createdAt: -1 })
+  .limit(limit);
 
-    const recentTasks = await TasksModel.find()
-      .sort({ createdAt: -1 })
-      .limit(limit);
 
     res.status(200).json(recentTasks);
   } catch (error: any) {

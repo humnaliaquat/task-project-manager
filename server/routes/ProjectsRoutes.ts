@@ -1,7 +1,8 @@
 import { Router } from "express";
 const router = Router();
 import Projects from "../controllers/ProjectsControllers"
-
+import { verifyToken } from "../middleware/authMiddleware";
+router.use(verifyToken);
 router.get("/",Projects.GetProjects );
 router.post("/", Projects.CreateProject);
 router.get("/:id",Projects.GetOneProject);

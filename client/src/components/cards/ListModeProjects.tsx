@@ -51,7 +51,10 @@ export default function ListModeProjects() {
     const fetchProjects = async () => {
       try {
         setLoading(true);
-        const res = await axios.get("http://localhost:3000/projects");
+        const authUser = JSON.parse(localStorage.getItem("authUser") || "{}");
+        const res = await axios.get("http://localhost:3000/projects", {
+          headers: { Authorization: `Bearer ${authUser.token}` },
+        });
         setProjects(res.data.filter((p: Project) => !p.isTrashed));
       } catch (error: any) {
         handleError(error.message || "Something went wrong");
@@ -94,7 +97,10 @@ export default function ListModeProjects() {
   }, []);
   const onDeleteProject = async (projectId: string) => {
     try {
-      await axios.put(`http://localhost:3000/projects/${projectId}/trash`);
+      const authUser = JSON.parse(localStorage.getItem("authUser") || "{}");
+      await axios.delete(`http://localhost:3000/projects/${projectId}`, {
+        headers: { Authorization: `Bearer ${authUser.token}` },
+      });
       setProjects((prev) => prev.filter((p) => p._id !== projectId));
     } catch (err) {
       console.error("Error moving to trash:", err);

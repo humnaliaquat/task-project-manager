@@ -4,6 +4,7 @@ import { handleError } from "../../utils/utils";
 import { Link } from "react-router-dom";
 import AddNewTask from "../tasks/AddNewTask";
 import { X } from "lucide-react";
+import { getAuthUser } from "../../utils/auth";
 
 type Task = {
   title: string;
@@ -26,7 +27,16 @@ export default function TasksCreatedToday() {
   const fetchTasks = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:3000/tasks");
+      const authUser = JSON.parse(localStorage.getItem("authUser") || "{}");
+
+      const res = await axios.get(
+        `http://localhost:3000/tasks/recent?userId=${authUser.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${authUser.token}`,
+          },
+        }
+      );
 
       if (!res.data || res.data.length === 0) {
         handleError("No tasks found");
@@ -71,9 +81,9 @@ export default function TasksCreatedToday() {
 
               {/* Your Form */}
               <AddNewTask
-                onClose={() => {
-                  setIsOpen(false);
-                  fetchTasks();
+                onClose={() => setIsOpen(false)}
+                onTaskAdded={(newTask) => {
+                  setTasks((prev) => [...prev, newTask]);
                 }}
               />
             </div>

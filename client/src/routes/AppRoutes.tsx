@@ -1,5 +1,4 @@
 import { Routes, Route } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
 import SignUpPage from "../pages/SignUpPage";
 import LandingPage from "../pages/LandingPage";
 import Login from "../pages/LoginPage";
@@ -7,10 +6,10 @@ import DashboardLayout from "../components/layout/DashboardLayout";
 import Dashboard from "../pages/Dashboard";
 import Projects from "../pages/Projects";
 import TasksPage from "../pages/TasksPage";
-import ProjectDetails from "../components/projects/ProjectDetails";
 import Trash from "../pages/Trash";
 import PublicRoutes from "./PublicRoutes";
 import PrivateRoutes from "./PrivateRoutes";
+import SettingsPage from "../pages/SettingsPage";
 
 export default function AppRoutes() {
   return (
@@ -68,13 +67,13 @@ export default function AppRoutes() {
           }
         />
         <Route
-          path="/projects/:id"
+          path="/settings"
           element={
             <PrivateRoutes>
-              <ProjectDetails />
+              <SettingsPage />
             </PrivateRoutes>
           }
-        />
+        ></Route>
         <Route
           path="/trash"
           element={

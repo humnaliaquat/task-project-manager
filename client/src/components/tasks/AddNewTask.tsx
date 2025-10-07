@@ -4,12 +4,14 @@ import { DayPicker } from "react-day-picker";
 import axios from "axios";
 import "react-day-picker/dist/style.css";
 import { handleError } from "../../utils/utils";
+import { getAuthUser } from "../../utils/auth";
 type Task = {
   title: string;
   description: string;
   project: string;
   dueDate: number;
   priority: string;
+  userId: string;
   status: string;
 };
 type Props = {
@@ -39,8 +41,11 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
     status: "to do",
     priority: "low",
     project: "",
+    userId: "",
   });
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setTask((prev) => ({
       ...prev,
@@ -54,6 +59,12 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
     const y = date.getFullYear();
     return `${d}/${m}/${y}`;
   };
+  const closeAllDropdowns = () => {
+    setIsStatusOpen(false);
+    setIsPriorityOpen(false);
+    setIsOpen(false);
+    setIsCalendarOpen(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,19 +77,29 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
       alert("Please select a due date.");
       return;
     }
+    const authUser = JSON.parse(localStorage.getItem("authUser") || "{}");
+    console.log("user from getAuthUser:", authUser);
 
     try {
       const payload = {
         title: task.title,
         description: task.description,
-        status: status.toLowerCase(),
-        dueDate: selected,
-        project: task.project,
+        status: status?.toLowerCase(),
         priority: priority?.toLowerCase(),
-        userId: "66f4f6a2e31a8e3a0cd8b1c7",
+        userId: authUser.id,
+        dueDate: selected?.toISOString(),
+        project: task.project,
       };
 
-      const res = await axios.post("http://localhost:3000/tasks", payload);
+      if (!authUser || !authUser.token) {
+        console.error("User not found or missing token. Please log in.");
+        return;
+      }
+      console.log("🔑 Sending token:", authUser.token);
+
+      const res = await axios.post("http://localhost:3000/tasks", payload, {
+        headers: { Authorization: `Bearer ${authUser.token}` },
+      });
 
       console.log("✅ Task created:", res.data);
       if (onTaskAdded) onTaskAdded(res.data);
@@ -91,6 +112,7 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
         dueDate: 0,
         status: "to do",
         priority: "",
+        userId: authUser,
       });
       setProjectSelected("Select Project");
       setPriority(null);
@@ -181,8 +203,8 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
           required
           type="text"
           name="title"
+          value={task.title}
           onChange={handleChange}
-          id="title"
           placeholder="Enter task title"
           className="w-full px-3 py-2 border border-gray-300 rounded-lg 
                      focus:outline-none focus:ring-none"
@@ -199,10 +221,12 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
         </label>
         <textarea
           name="description"
+          value={task.description}
+          onChange={handleChange}
           id="description"
           placeholder="Enter task details..."
           className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none 
-                     focus:outline-none focus:ring-2 focus:ring-violet-500"
+                     focus:outline-none focus:ring-none focus:ring-violet-500"
           rows={3}
         ></textarea>
       </div>
@@ -217,11 +241,14 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
           <button
             id="status"
             type="button"
-            onClick={() => setIsStatusOpen(!isStatusOpen)}
+            onClick={() => {
+              closeAllDropdowns();
+              setIsStatusOpen((prev) => !prev);
+            }}
             className={`w-full flex items-center justify-between px-3 py-2 border 
                        border-gray-300 rounded-lg bg-white 
                        ${status ? "text-gray-700" : "text-gray-400"}
-                       hover:border-violet-500 focus:ring-2 focus:ring-violet-500`}
+                        focus:ring-none focus:ring-violet-500`}
           >
             {status || "Select status"}
             <ChevronDown size={16} className="text-gray-500" />
@@ -254,11 +281,14 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
           </label>
           <button
             type="button"
-            onClick={() => setIsCalendarOpen(!isCalendarOpen)}
+            onClick={() => {
+              closeAllDropdowns();
+              setIsCalendarOpen((prev) => !prev);
+            }}
             className={`w-full flex items-center justify-between px-3 py-2 border 
                        border-gray-300 rounded-lg bg-white 
                        ${selected ? "text-gray-700" : "text-gray-400"}
-                       hover:border-violet-500 focus:ring-2 focus:ring-violet-500`}
+                        focus:ring-none focus:ring-violet-500`}
           >
             {selected ? formatDate(selected) : "Select a date"}
 
@@ -299,11 +329,14 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
         <button
           id="priority"
           type="button"
-          onClick={() => setIsPriorityOpen(!isPriorityOpen)}
+          onClick={() => {
+            closeAllDropdowns();
+            setIsPriorityOpen((prev) => !prev);
+          }}
           className={`w-full flex items-center justify-between px-3 py-2 border 
                 border-gray-300 rounded-lg bg-white 
                 ${priority ? "text-gray-700" : "text-gray-400"}
-                hover:border-violet-500 focus:ring-2 focus:ring-violet-500`}
+                 focus:ring-none focus:ring-violet-500`}
         >
           {priority || "Select priority"}
           <ChevronDown size={16} className="text-gray-500" />

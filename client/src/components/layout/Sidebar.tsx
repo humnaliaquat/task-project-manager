@@ -51,7 +51,7 @@ export default function Sidebar() {
         <div>
           {/* Brand */}
           <div className="mb-8">
-            <h1 className="font-medium text-xl text-slate-900">Planora</h1>
+            <p className="font-medium text-xl text-slate-900">Planora</p>
           </div>
 
           {/* Menu */}

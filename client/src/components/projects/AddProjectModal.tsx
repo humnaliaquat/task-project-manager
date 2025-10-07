@@ -31,6 +31,7 @@ export default function AddProjectModal({
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [selected, setSelected] = useState<Date | null>(null);
+  const authUser = JSON.parse(localStorage.getItem("authUser") || "{}");
   const [project, setProject] = useState<Project>({
     _id: initialProject._id || "",
     title: initialProject.title || "",
@@ -70,21 +71,32 @@ export default function AddProjectModal({
         status: status || project.status,
         inChargeName: project.inChargeName,
         priority: priority || project.priority,
-        userId: "66f4f6a2e31a8e3a0cd8b1c7",
+        userId: authUser.id,
       };
+      if (!authUser || !authUser.token) {
+        console.error("User not found or missing token. Please log in.");
+        return;
+      }
+      console.log("🔑 Sending token:", authUser.token);
 
       let res;
+
       if (project._id) {
-        // Update
+        // 🛠️ Update existing project
         res = await axios.put(
           `http://localhost:3000/projects/${project._id}`,
-          payload
+          payload,
+          {
+            headers: { Authorization: `Bearer ${authUser.token}` },
+          }
         );
       } else {
-        // Create
-        res = await axios.post("http://localhost:3000/projects", payload);
+        // 🆕 Create new project
+        res = await axios.post("http://localhost:3000/projects", payload, {
+          headers: { Authorization: `Bearer ${authUser.token}` },
+        });
       }
-
+      console.log("✅ Task created:", res.data);
       onProjectAdded?.(res.data);
 
       if (!project._id) {

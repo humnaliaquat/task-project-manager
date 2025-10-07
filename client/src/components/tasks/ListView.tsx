@@ -7,7 +7,7 @@ type Task = {
   description: string;
   dueDate: string;
   priority?: "high" | "medium" | "low";
-  status: "todo" | "inprogress" | "completed";
+  status: "to do" | "in progress" | "completed";
 };
 
 type ListViewProps = {
@@ -139,11 +139,11 @@ export default function ListView({ tasks, loading }: ListViewProps) {
       <div className="flex flex-col gap-6">
         <TaskColumn
           title="To Do"
-          tasks={tasks.filter((t) => t.status === "todo")}
+          tasks={tasks.filter((t) => t.status === "to do")}
         />
         <TaskColumn
           title="In Progress"
-          tasks={tasks.filter((t) => t.status === "inprogress")}
+          tasks={tasks.filter((t) => t.status === "in progress")}
         />
         <TaskColumn
           title="Completed"
