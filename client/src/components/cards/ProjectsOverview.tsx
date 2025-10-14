@@ -1,12 +1,43 @@
-import React from "react";
-
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+type ProjectStats = {
+  totalCount: number;
+  completedCount: number;
+  inProgressCount: number;
+  pendingCount: number;
+  dueTodayCount: number;
+};
 export default function ProjectsOverview() {
+  const [stats, setStats] = useState<ProjectStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const authUser = JSON.parse(localStorage.getItem("authUser") || "{}");
+
+        const res = await axios.get("http://localhost:3000/projects/stats", {
+          headers: {
+            Authorization: `Bearer ${authUser.token}`,
+          },
+        });
+
+        setStats(res.data);
+      } catch (error) {
+        console.error("Failed to fetch task stats", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
   const collection = [
-    { name: "Total Projects", count: 8 },
-    { name: "Pending Projects", count: 3 },
-    { name: "Completed Projects", count: 5 },
-    { name: "In Progress", count: 5 },
-    { name: "Due today", count: 0 },
+    { name: "Total Projects", count: stats?.totalCount },
+    { name: "Pending Projects", count: stats?.pendingCount },
+    { name: "Completed Projects", count: stats?.completedCount },
+    { name: "In Progress", count: stats?.inProgressCount },
+    { name: "Due today", count: stats?.dueTodayCount },
   ];
 
   return (

@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import { MoreHorizontal, Plus } from "lucide-react";
+import { MoreHorizontal, Plus, X } from "lucide-react";
 import axios from "axios";
 import { handleError } from "../../utils/utils";
 import { useAuth } from "../../context/AuthContext";
+import AddNewTask from "./AddNewTask";
 
 type Task = {
   _id: string;
@@ -22,6 +23,10 @@ type Props = {
 
 export default function BoardView({ tasks, loading, setTasks }: Props) {
   const { user } = useAuth();
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+
+  const selectAllRef = useRef<HTMLInputElement | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
   const columns = [
     {
       id: "to do",
@@ -121,9 +126,30 @@ export default function BoardView({ tasks, loading, setTasks }: Props) {
                   <span className={`w-3 h-3 rounded-full ${col.dot}`}></span>
                   <h2 className="font-semibold text-gray-800">{col.title}</h2>
                 </div>
-                <button className="text-gray-400 cursor-pointer hover:text-gray-600">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    className="accent-violet-600 cursor-pointer"
+                    checked={
+                      filteredTasks.length > 0 &&
+                      filteredTasks.every((task) =>
+                        selectedItems.includes(task._id)
+                      )
+                    }
+                    onChange={(e) => {
+                      const isChecked = e.target.checked;
+                      const taskIds = filteredTasks.map((task) => task._id);
+
+                      setSelectedItems(
+                        (prev) =>
+                          isChecked
+                            ? Array.from(new Set([...prev, ...taskIds])) // Add all from this column
+                            : prev.filter((id) => !taskIds.includes(id)) // Remove all from this column
+                      );
+                    }}
+                  />
                   <MoreHorizontal size={18} />
-                </button>
+                </div>
               </div>
 
               {/* Droppable Area */}
@@ -161,6 +187,14 @@ export default function BoardView({ tasks, loading, setTasks }: Props) {
                                 <div className="flex items-center gap-2">
                                   <input
                                     type="checkbox"
+                                    checked={selectedItems.includes(task._id)}
+                                    onChange={() => {
+                                      setSelectedItems((prev) =>
+                                        prev.includes(task._id)
+                                          ? prev.filter((id) => id !== task._id)
+                                          : [...prev, task._id]
+                                      );
+                                    }}
                                     className="accent-violet-600 cursor-pointer"
                                   />
                                   <button className="text-gray-400 hover:text-gray-600 cursor-pointer">
@@ -209,13 +243,52 @@ export default function BoardView({ tasks, loading, setTasks }: Props) {
               </Droppable>
 
               {/* Add Task Button */}
-              <button className="mt-4 w-full flex items-center justify-center gap-2 px-3 py-2 border border-dashed border-violet-400 cursor-pointer text-violet-600 rounded-lg hover:bg-violet-50 transition">
+              <button
+                className="mt-4 w-full flex items-center justify-center gap-2 px-3 py-2 border border-dashed border-violet-400 cursor-pointer text-violet-600 rounded-lg hover:bg-violet-50 transition"
+                onClick={() => setIsOpen(true)}
+              >
                 <Plus size={16} />
                 <span className="text-sm font-medium">Add Task</span>
               </button>
+              {/* Modal */}
+              {isOpen && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black/10 z-50 overflow-y-auto ">
+                  <div className="bg-white  rounded-xl  w-[90%] max-w-md p-6 relative ">
+                    {/* Close Button */}
+                    <button
+                      onClick={() => setIsOpen(false)}
+                      className="absolute -top-2 -right-2 bg-violet-200 shadow-2xl rounded-full w-8.5 h-8.5 flex items-center justify-center text-violet-900 hover:bg-violet-300 cursor-pointer"
+                    >
+                      <X size={18} />
+                    </button>
+
+                    {/* Your Form */}
+                    <AddNewTask
+                      onClose={() => setIsOpen(false)}
+                      onTaskAdded={(newTask) => {
+                        setTasks((prev) => [...prev, newTask]);
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           );
         })}
+        {/* Floating Action Bar */}
+        {selectedItems.length > 0 && (
+          <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-white border border-gray-400 shadow-lg px-6 py-3 rounded-xl flex gap-4 items-center animate-fadeIn z-50">
+            <p className="text-sm text-gray-600">
+              {selectedItems.length} selected
+            </p>
+            <button className="px-3 py-1.5 text-sm bg-gray-200  rounded-lg hover:bg-gray-300 cursor-pointer">
+              Cancel
+            </button>
+            <button className="px-3 py-1.5 text-sm cursor-pointer bg-red-500 text-white rounded-lg hover:bg-red-600">
+              Delete
+            </button>
+          </div>
+        )}
       </div>
     </DragDropContext>
   );

@@ -15,6 +15,8 @@ type Task = {
 };
 export default function ViewsCombined() {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+
   const params =
     typeof window !== "undefined"
       ? new URLSearchParams(window.location.search)
@@ -23,6 +25,13 @@ export default function ViewsCombined() {
     (params.get("view") as "board" | "list") || "board"
   );
   const [tasks, setTasks] = React.useState<any[]>([]);
+  const filteredTasks = tasks.filter((task) =>
+    [task.title, task.description]
+      .join(" ")
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
+  );
+
   const [loading, setLoading] = useState(true);
   const handleViewChange = (mode: "board" | "list") => {
     setViewMode(mode);
@@ -87,8 +96,10 @@ export default function ViewsCombined() {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input
             type="text"
-            placeholder="Search project..."
-            className="border border-gray-300 pl-10 pr-3 py-2 rounded-xl w-full focus:ring-2 focus:ring-violet-400 outline-none text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search task..."
+            className="border border-gray-300 pl-10 pr-3 py-2 rounded-xl w-full focus:ring-1 focus:ring-violet-400 outline-none text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
           />
         </div>
 
@@ -133,7 +144,7 @@ export default function ViewsCombined() {
 
           {/* Modal */}
           {isOpen && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 overflow-y-auto ">
+            <div className="fixed inset-0 flex items-center justify-center bg-black/10 z-50 overflow-y-auto ">
               <div className="bg-white  rounded-xl  w-[90%] max-w-md p-6 relative ">
                 {/* Close Button */}
                 <button
@@ -157,9 +168,13 @@ export default function ViewsCombined() {
       </header>
       <main className="overflow-x-auto">
         {viewMode === "board" ? (
-          <BoardView tasks={tasks} loading={loading} setTasks={setTasks} />
+          <BoardView
+            tasks={filteredTasks}
+            loading={loading}
+            setTasks={setTasks}
+          />
         ) : (
-          <ListView tasks={tasks} loading={loading} />
+          <ListView tasks={filteredTasks} loading={loading} />
         )}
       </main>
     </div>

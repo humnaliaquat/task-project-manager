@@ -1,13 +1,48 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
+type TaskStats = {
+  totalCount: number;
+  completedCount: number;
+  inProgressCount: number;
+  pendingCount: number;
+  dueTodayCount: number;
+};
 export default function TasksOverview() {
-  const collection = [
-    { name: "Total tasks", count: 8 },
-    { name: "Pending tasks", count: 3 },
-    { name: "Completed tasks", count: 5 },
-    { name: "In Progress", count: 5 },
-    { name: "Due today", count: 0 },
-  ];
+  const [stats, setStats] = useState<TaskStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const authUser = JSON.parse(localStorage.getItem("authUser") || "{}");
+
+        const res = await axios.get("http://localhost:3000/tasks/stats", {
+          headers: {
+            Authorization: `Bearer ${authUser.token}`,
+          },
+        });
+
+        setStats(res.data);
+      } catch (error) {
+        console.error("Failed to fetch task stats", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  const collection = stats
+    ? [
+        { name: "Total tasks", count: stats.totalCount },
+        { name: "Pending tasks", count: stats.pendingCount },
+        { name: "Completed tasks", count: stats.completedCount },
+        { name: "In Progress", count: stats.inProgressCount },
+        { name: "Due today", count: stats.dueTodayCount },
+      ]
+    : [];
 
   return (
     <div className="p-4 pt-4 pb-3 dark:bg-gray-900 rounded-xl">

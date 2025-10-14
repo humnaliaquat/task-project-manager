@@ -8,7 +8,7 @@ import { getAuthUser } from "../../utils/auth";
 type Task = {
   title: string;
   description: string;
-  project: string;
+  projectId: string;
   dueDate: number;
   priority: string;
   userId: string;
@@ -40,7 +40,7 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
     dueDate: 12,
     status: "to do",
     priority: "low",
-    project: "",
+    projectId: "",
     userId: "",
   });
   const handleChange = (
@@ -88,7 +88,7 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
         priority: priority?.toLowerCase(),
         userId: authUser.id,
         dueDate: selected?.toISOString(),
-        project: task.project,
+        projectId: task.projectId,
       };
 
       if (!authUser || !authUser.token) {
@@ -108,11 +108,11 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
       setTask({
         title: "",
         description: "",
-        project: "",
+        projectId: "",
         dueDate: 0,
         status: "to do",
         priority: "",
-        userId: authUser,
+        userId: authUser.id,
       });
       setProjectSelected("Select Project");
       setPriority(null);
@@ -127,7 +127,10 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const url = await axios.get("http://localhost:3000/projects");
+        const authUser = JSON.parse(localStorage.getItem("authUser") || "{}");
+        const url = await axios.get("http://localhost:3000/projects", {
+          headers: { Authorization: `Bearer ${authUser.token}` },
+        });
         setProjects(url.data);
       } catch (err: any) {
         handleError("Failed to fetch projects");
@@ -175,10 +178,10 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
                       key={project._id}
                       className="px-4 py-2 text-sm hover:bg-violet-50 cursor-pointer"
                       onClick={() => {
-                        setProjectSelected(project.title); // show project name
+                        setProjectSelected(project.title);
                         setTask((prev) => ({
                           ...prev,
-                          project: project._id, // save project ID
+                          projectId: project._id,
                         }));
                         setIsOpen(false);
                       }}

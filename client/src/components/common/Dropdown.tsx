@@ -1,5 +1,7 @@
 import React from "react";
 import { User, Settings, LogOut, Palette } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 type DropdownProps = {
   name?: string;
@@ -14,18 +16,29 @@ export default function Dropdown({
   avatarLetter = "J",
   onLogout,
 }: DropdownProps) {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
   const items = [
+    {
+      name: "My Profile",
+      icon: User,
+      onClick: () => navigate("/settings?tab=Profile"),
+    },
     {
       name: "Manage Account",
       icon: User,
-      onClick: () => console.log("Manage Account"),
+      onClick: () => navigate("/settings?tab=Account"),
     },
     {
       name: "Settings",
       icon: Settings,
-      onClick: () => console.log("Settings"),
+      onClick: () => navigate("/settings"),
     },
-    { name: "Theme", icon: Palette, onClick: () => console.log("Theme") },
+    {
+      name: "Theme",
+      icon: Palette,
+      onClick: () => navigate("/settings?tab=Appearance"),
+    },
   ];
 
   return (
@@ -58,7 +71,10 @@ export default function Dropdown({
       {/* Footer */}
       <footer className="border-t border-gray-200 p-2">
         <button
-          onClick={onLogout}
+          onClick={() => {
+            logout();
+            navigate("/login");
+          }}
           className="flex w-full items-center gap-2 px-3 py-2.5 rounded-lg text-red-600 hover:bg-violet-50  focus:bg-red-50 focus:outline-none cursor-pointer"
         >
           <LogOut size={18} />

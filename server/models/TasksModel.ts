@@ -11,6 +11,11 @@ const TasksSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+     projectId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Project",
+      required: true,
+    },
     status: {
       type: String,
       enum: ["to do", "in progress", "completed"],

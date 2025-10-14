@@ -7,7 +7,8 @@ router.use(verifyToken);
 
 // GET all tasks
 router.get("/", verifyToken, TaskController.GetAllTasks);
-
+//Get stats
+router.get("/stats", verifyToken, TaskController.GetTaskStats);
 // recent task 
 router.get("/recent", verifyToken, TaskController.getRecentTasks);
 

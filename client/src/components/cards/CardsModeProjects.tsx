@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+// CardsModeProjects.tsx
+
+import React, { useState, useRef, useEffect } from "react";
 import { MoreHorizontal, X } from "lucide-react";
-import axios from "axios";
-import { handleError, handleSuccess } from "../../utils/utils";
 import ProjectDetails from "../projects/ProjectDetails";
 import ActionDropdown from "../projects/dropdown/ActionDropdown";
-import AddProjectModal from "../projects/AddProjectModal";
-import { useProjectStore } from "../../store/useProjectStore";
+
+// --- START: Props Definition (Must match the parent) ---
 type Project = {
   _id: string;
   title: string;
@@ -13,58 +13,46 @@ type Project = {
   dueDate?: string;
   inChargeName?: string;
   isTrashed?: boolean;
+  role?: string;
+  completedTasks?: number;
+  totalTasks?: number;
+  progress?: number;
 };
-export default function CardsModeProjects() {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
-  const [isEditInfoOpen, setIsEditInfoOpen] = useState(false);
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
-    null
-  );
-  const [editProject, setEditProject] = useState<Project | null>(null);
 
-  const projectsPerPage = 6;
-  const [projects, setProjects] = useState<any[]>([]);
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
-  const [loading, setLoading] = useState(true);
-  const totalPages = Math.ceil(projects.length / projectsPerPage);
-  const startIndex = (currentPage - 1) * projectsPerPage;
-  const currentProjects = projects.slice(
-    startIndex,
-    startIndex + projectsPerPage
-  );
+type CardsModeProps = {
+  currentProjects: Project[];
+  totalPages: number;
+  currentPage: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  onDeleteProject: (projectId: string) => Promise<void>;
+  setSelectedProjectId: React.Dispatch<React.SetStateAction<string | null>>;
+  setEditProject: React.Dispatch<React.SetStateAction<Project | null>>;
+  setIsProjectModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedProjectId: string | null;
+  editProject: Project | null;
+  handleProjectAdded: (newProject: Project) => void;
+};
+// --- END: Props Definition ---
+
+export default function CardsModeProjects({
+  currentProjects,
+  totalPages,
+  currentPage,
+  setCurrentPage,
+  onDeleteProject,
+  setSelectedProjectId,
+  setEditProject,
+  setIsProjectModalOpen,
+  selectedProjectId,
+}: CardsModeProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
   const toggleDropdown = (id: string) => {
     setIsDropdownOpen(isDropdownOpen === id ? null : id);
   };
-  const onDeleteProject = async (projectId: string) => {
-    try {
-      const authUser = JSON.parse(localStorage.getItem("authUser") || "{}");
-      await axios.delete(`http://localhost:3000/projects/${projectId}`, {
-        headers: { Authorization: `Bearer ${authUser.token}` },
-      });
-      setProjects((prev) => prev.filter((p) => p._id !== projectId));
-    } catch (err) {
-      console.error("Error moving to trash:", err);
-    }
-  };
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        setLoading(true);
-        const authUser = JSON.parse(localStorage.getItem("authUser") || "{}");
-        const res = await axios.get("http://localhost:3000/projects", {
-          headers: { Authorization: `Bearer ${authUser.token}` },
-        });
-        setProjects(res.data.filter((p: Project) => !p.isTrashed));
-      } catch (error: any) {
-        handleError(error.message || "Something went wrong");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProjects();
-  }, []);
+
+  // Cleanup effect for dropdown
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -74,21 +62,21 @@ export default function CardsModeProjects() {
         setIsDropdownOpen(null);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-  if (loading) {
-    return <p className="text-center mt-10">Loading projects...</p>;
-  }
+
+  const handleEdit = (project: Project) => {
+    setEditProject(project);
+    setIsProjectModalOpen(true);
+    setIsDropdownOpen(null);
+  };
+
   return (
     <div>
       {/* Cards */}
-      {/* Cards */}
       <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {currentProjects.length === 0 ? (
+        {currentProjects.length === 0 && totalPages === 1 ? (
           <div className="col-span-full text-center  text-gray-500 ">
             <p className="text-lg font-medium">No projects yet</p>
             <p className="text-sm mt-2">
@@ -134,58 +122,24 @@ export default function CardsModeProjects() {
                     </button>
                     {isDropdownOpen == item._id && (
                       <div
-                        className="absolute top-4 z-50 bg-white right-0"
+                        className="absolute top-4 z-50 bg-white right-0 shadow-lg rounded-md border border-gray-200"
                         ref={dropdownRef}
                       >
                         <ActionDropdown
-                          onViewDetails={() => setSelectedProjectId(item._id)}
-                          onEditProject={() => {
-                            setEditProject(item);
-                            setIsProjectModalOpen(true);
+                          onViewDetails={() => {
+                            setSelectedProjectId(item._id);
+                            setIsDropdownOpen(null);
                           }}
-                          onAddTask={() =>
-                            console.log("TODO: open Add Task modal")
-                          }
-                          onDeleteProject={() => onDeleteProject(item._id)}
+                          onEditProject={() => handleEdit(item)}
+                          onAddTask={() => {
+                            console.log("TODO: open Add Task modal");
+                            setIsDropdownOpen(null);
+                          }}
+                          onDeleteProject={() => {
+                            onDeleteProject(item._id);
+                            setIsDropdownOpen(null);
+                          }}
                         />
-                      </div>
-                    )}
-                    {/* Project Modal (New/Edit) */}
-                    {isProjectModalOpen && (
-                      <div className="fixed inset-0 bg-black/10 flex items-center justify-center z-50">
-                        <div className="relative bg-white p-6 rounded-xl shadow-lg w-[90%] max-w-md">
-                          {/* Close Button inside modal */}
-                          <button
-                            onClick={() => {
-                              setIsProjectModalOpen(false);
-                              setEditProject(null);
-                            }}
-                            className="absolute -top-2  cursor-pointer -right-2 bg-violet-200 rounded-full w-8 h-8 flex items-center justify-center text-gray-700 hover:bg-gray-300"
-                          >
-                            <X size={18} />
-                          </button>
-
-                          <AddProjectModal
-                            initialProject={editProject || undefined}
-                            onClose={() => {
-                              setIsProjectModalOpen(false);
-                              setEditProject(null);
-                            }}
-                            onProjectAdded={(newProject) => {
-                              if (editProject) {
-                                setProjects((prev) =>
-                                  prev.map((p) =>
-                                    p._id === newProject._id ? newProject : p
-                                  )
-                                );
-                              } else {
-                                setProjects((prev) => [newProject, ...prev]);
-                              }
-                              setIsProjectModalOpen(false);
-                              setEditProject(null);
-                            }}
-                          />
-                        </div>
                       </div>
                     )}
                   </div>
@@ -196,26 +150,28 @@ export default function CardsModeProjects() {
               <section className="grid grid-cols-2 gap-3 text-sm text-slate-600">
                 <div>
                   <p className="text-gray-500">Incharge</p>
-                  <p className="font-medium">{item.inChargeName}</p>
+                  <p className="font-medium">{item.inChargeName || "N/A"}</p>
                 </div>
                 <div>
                   <p className="text-gray-500">Role</p>
-                  <p className="font-medium">{item.role}</p>
+                  <p className="font-medium">{item.role || "N/A"}</p>
                 </div>
                 <div>
                   <p className="text-gray-500">Tasks</p>
                   <p className="font-medium">
-                    {item.completedTasks}/{item.totalTasks}
+                    {item.completedTasks || 0}/{item.totalTasks || 0}
                   </p>
                 </div>
                 <div>
                   <p className="text-gray-500">Deadline</p>
                   <p className="font-medium">
-                    {new Date(item.dueDate).toLocaleDateString("en-US", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
+                    {item.dueDate
+                      ? new Date(item.dueDate).toLocaleDateString("en-US", {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        })
+                      : "N/A"}
                   </p>
                 </div>
               </section>
@@ -224,12 +180,12 @@ export default function CardsModeProjects() {
               <div>
                 <div className="flex justify-between items-center text-sm mb-1">
                   <p className="text-gray-500">Progress</p>
-                  <p className="font-medium">{item.progress}%</p>
+                  <p className="font-medium">{item.progress || 0}%</p>
                 </div>
                 <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-violet-500"
-                    style={{ width: `${item.progress}%` }}
+                    style={{ width: `${item.progress || 0}%` }}
                   ></div>
                 </div>
               </div>
@@ -244,59 +200,18 @@ export default function CardsModeProjects() {
                 </button>
 
                 <button
-                  onClick={() => {
-                    setEditProject(item);
-                    setIsEditInfoOpen(true);
-                  }}
+                  onClick={() => handleEdit(item)}
                   className="flex-1 border relative border-violet-200 text-violet-600 rounded-lg py-2 text-sm hover:bg-violet-50 cursor-pointer"
                 >
                   Edit Info
                 </button>
-
-                {isEditInfoOpen && (
-                  <div className="fixed inset-0 bg-black/10 flex items-center justify-center z-50">
-                    <div className="relative bg-white p-6 rounded-xl shadow-lg w-[90%] max-w-md">
-                      {/* Close Button inside modal */}
-                      <button
-                        onClick={() => {
-                          setIsEditInfoOpen(false);
-                          setEditProject(item);
-                        }}
-                        className="absolute -top-2  cursor-pointer -right-2 bg-violet-200 rounded-full w-8 h-8 flex items-center justify-center text-gray-700 hover:bg-gray-300"
-                      >
-                        <X size={18} />
-                      </button>
-
-                      <AddProjectModal
-                        initialProject={editProject || undefined}
-                        onClose={() => {
-                          setIsEditInfoOpen(false);
-                          setEditProject(null);
-                        }}
-                        onProjectAdded={(newProject) => {
-                          if (editProject) {
-                            setProjects((prev) =>
-                              prev.map((p) =>
-                                p._id === newProject._id ? newProject : p
-                              )
-                            );
-                          } else {
-                            setProjects((prev) => [newProject, ...prev]);
-                          }
-                          setIsEditInfoOpen(false);
-                          setEditProject(null);
-                        }}
-                      />
-                    </div>
-                  </div>
-                )}
               </footer>
             </div>
           ))
         )}
       </main>
 
-      {/* Render ProjectDetails once */}
+      {/* Render ProjectDetails */}
       {selectedProjectId && (
         <ProjectDetails
           projectId={selectedProjectId}
@@ -304,7 +219,7 @@ export default function CardsModeProjects() {
         />
       )}
 
-      {/* Pagination */}
+      {/* Pagination (now uses props) */}
       <footer className="flex justify-between items-center mt-6 text-sm text-gray-600">
         <button
           onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}

@@ -12,6 +12,7 @@ const ProjectsSchema = new mongoose.Schema(
       default: "",
     },
     isTrashed: { type: Boolean, default: false },
+      deletedOn: { type: Date, default: null },
      priority: {
       type: String,
       enum: ["low", "medium", "high"], 

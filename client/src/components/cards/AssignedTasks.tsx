@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Eye, MoreHorizontal, MoveRight, MoveUpRight } from "lucide-react";
+import { Eye, MoreHorizontal, MoveRight, MoveUpRight, X } from "lucide-react";
 import AllAssignedTask from "../assigned/AllAssignedTask";
 import Dropdown from "../assigned/Dropdown";
 import AddAssignedTask from "../assigned/AddAssignedTask";
@@ -25,10 +25,12 @@ export default function AssignedTasks() {
   ];
   const menuItems = [
     { label: "Add Task", onClick: () => setIsAddOpen(true) },
-    { label: "View All", onClick: () => console.log("Edit clicked") },
+    { label: "View All", onClick: () => setIsAllOpen(true) },
   ];
+
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isAllOpen, setIsAllOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -63,7 +65,6 @@ export default function AssignedTasks() {
               <Dropdown items={menuItems} />
             </div>
           )}
-          {isAddOpen && <AddAssignedTask />}
         </div>
       </div>
 
@@ -95,12 +96,17 @@ export default function AssignedTasks() {
         ))}
         <button
           className="flex items-center justify-end gap-1.5 w-full text-sm font-medium text-violet-600 hover:text-violet-700 hover:underline transition-colors duration-200 p-2 cursor-pointer"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => setIsAllOpen(true)}
         >
           <span>View All</span>
           <MoveRight size={16} className="shrink-0" />
         </button>
-        <AllAssignedTask isOpen={isOpen} onClose={() => setIsOpen(false)} />
+        {isAllOpen && (
+          <AllAssignedTask
+            isOpen={isAllOpen}
+            onClose={() => setIsAllOpen(false)}
+          />
+        )}
       </div>
     </div>
   );

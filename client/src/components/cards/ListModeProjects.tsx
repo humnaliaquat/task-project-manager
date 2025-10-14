@@ -1,11 +1,11 @@
-import { useEffect, useState, useRef } from "react";
-import ProjectDetails from "../projects/ProjectDetails";
-import { handleError } from "../../utils/utils";
-import { MoreHorizontal, X } from "lucide-react";
-import axios from "axios";
-import ActionDropdown from "../projects/dropdown/ActionDropdown";
-import AddProjectModal from "../projects/AddProjectModal";
+// ListModeProjects.tsx
 
+import { useState, useRef, useEffect } from "react";
+import ProjectDetails from "../projects/ProjectDetails";
+import { MoreHorizontal, X } from "lucide-react";
+import ActionDropdown from "../projects/dropdown/ActionDropdown";
+
+// --- START: Props Definition (Must match the parent) ---
 type Project = {
   _id: string;
   title: string;
@@ -15,56 +15,75 @@ type Project = {
   isTrashed?: boolean;
 };
 
-export default function ListModeProjects() {
-  const [currentPage, setCurrentPage] = useState(1);
+type ListModeProps = {
+  currentProjects: Project[];
+  totalPages: number;
+  currentPage: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  onDeleteProject: (projectId: string) => Promise<void>;
+  setSelectedProjectId: React.Dispatch<React.SetStateAction<string | null>>;
+  setEditProject: React.Dispatch<React.SetStateAction<Project | null>>;
+  setIsProjectModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedProjectId: string | null;
+  editProject: Project | null;
+  handleProjectAdded: (newProject: Project) => void;
+};
+// --- END: Props Definition ---
+
+export default function ListModeProjects({
+  currentProjects,
+  totalPages,
+  currentPage,
+  setCurrentPage,
+  onDeleteProject,
+  setSelectedProjectId,
+  setEditProject,
+  setIsProjectModalOpen,
+  selectedProjectId,
+}: ListModeProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState<string | null>(null);
   const [isSmScreenDropdownOpen, setIsSmScreenDropdownOpen] = useState<
     string | null
   >(null);
-  const [loading, setLoading] = useState(true);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const projectsPerPage = 10;
-  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-  const [editProject, setEditProject] = useState<Project | null>(null);
+  const [dropdownPosition, setDropdownPosition] = useState<{
+    top: number;
+    left: number;
+  }>({ top: 0, left: 0 });
 
-  const indexOfLast = currentPage * projectsPerPage;
-  const indexOfFirst = indexOfLast - projectsPerPage;
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const smDropdownRef = useRef<HTMLDivElement | null>(null);
-  const currentProjects = projects.slice(indexOfFirst, indexOfLast);
-  const toggleDropdown = (id: string) => {
-    setIsDropdownOpen(isDropdownOpen === id ? null : id);
+
+  const toggleDropdown = (
+    id: string,
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    // ... (Desktop dropdown positioning logic remains the same)
+    if (isDropdownOpen === id) {
+      setIsDropdownOpen(null);
+    } else {
+      const rect = event.currentTarget.getBoundingClientRect();
+      const dropdownWidth = 164;
+
+      const spaceRight = window.innerWidth - rect.right;
+      const left =
+        spaceRight > dropdownWidth
+          ? rect.right + window.scrollX
+          : rect.left - dropdownWidth + window.scrollX;
+
+      setDropdownPosition({
+        top: rect.top + window.scrollY,
+        left,
+      });
+
+      setIsDropdownOpen(id);
+    }
   };
+
   const toggleSmDropdown = (id: string) => {
     setIsSmScreenDropdownOpen(isSmScreenDropdownOpen === id ? null : id);
   };
-  const totalPages = Math.ceil(projects.length / projectsPerPage) || 1;
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
-    null
-  );
-  const [selectedSmProjectId, setSelectedSmProjectId] = useState<string | null>(
-    null
-  );
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        setLoading(true);
-        const authUser = JSON.parse(localStorage.getItem("authUser") || "{}");
-        const res = await axios.get("http://localhost:3000/projects", {
-          headers: { Authorization: `Bearer ${authUser.token}` },
-        });
-        setProjects(res.data.filter((p: Project) => !p.isTrashed));
-      } catch (error: any) {
-        handleError(error.message || "Something went wrong");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProjects();
-  }, []);
-
+  // Clean up effect for desktop dropdown
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -74,12 +93,11 @@ export default function ListModeProjects() {
         setIsDropdownOpen(null);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Clean up effect for mobile dropdown
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -89,31 +107,22 @@ export default function ListModeProjects() {
         setIsSmScreenDropdownOpen(null);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-  const onDeleteProject = async (projectId: string) => {
-    try {
-      const authUser = JSON.parse(localStorage.getItem("authUser") || "{}");
-      await axios.delete(`http://localhost:3000/projects/${projectId}`, {
-        headers: { Authorization: `Bearer ${authUser.token}` },
-      });
-      setProjects((prev) => prev.filter((p) => p._id !== projectId));
-    } catch (err) {
-      console.error("Error moving to trash:", err);
-    }
+
+  const handleEdit = (project: Project) => {
+    setEditProject(project);
+    setIsProjectModalOpen(true);
+    setIsDropdownOpen(null);
+    setIsSmScreenDropdownOpen(null);
   };
 
-  if (loading) {
-    return <p className="text-center mt-10">Loading projects...</p>;
-  }
+  // NOTE: ProjectModal is now rendered in the parent ProjectCards.tsx
 
   return (
     <div className="w-full">
-      {projects.length === 0 ? (
+      {currentProjects.length === 0 && totalPages === 1 ? (
         <div className="text-center text-gray-600">
           <p className="text-lg font-medium">No projects yet</p>
           <p className="text-sm mt-2">
@@ -149,10 +158,6 @@ export default function ListModeProjects() {
                       >
                         {project.title}
                       </button>
-                      <ProjectDetails
-                        projectId={selectedProjectId}
-                        onClose={() => setSelectedProjectId(null)}
-                      />
                     </td>
                     <td className="px-4 py-2">{project.status || "N/A"}</td>
                     <td className="px-4 py-2">
@@ -172,84 +177,53 @@ export default function ListModeProjects() {
                     </td>
                     <td className="px-4 py-2 text-left">
                       <div className="relative">
-                        <button className="cursor-pointer flex items-center justify-center">
+                        <button
+                          className="cursor-pointer flex items-center justify-center"
+                          onClick={(e) => toggleDropdown(project._id, e)}
+                        >
                           <MoreHorizontal
                             size={18}
                             className="text-gray-600 hover:text-gray-700"
-                            onClick={() => toggleDropdown(project._id)}
                           />
                         </button>
-                        {isDropdownOpen == project._id && (
-                          <div
-                            className="absolute top-4 z-50 bg-white right-16"
-                            ref={dropdownRef}
-                          >
-                            <ActionDropdown
-                              onViewDetails={() =>
-                                setSelectedProjectId(project._id)
-                              }
-                              onEditProject={() => {
-                                setEditProject(project);
-                                setIsProjectModalOpen(true);
-                              }}
-                              onAddTask={() =>
-                                console.log("TODO: open Add Task modal")
-                              }
-                              onDeleteProject={() =>
-                                onDeleteProject(project._id)
-                              }
-                            />
-                          </div>
-                        )}
-                        {/* Project Modal (New/Edit) */}
-                        {isProjectModalOpen && (
-                          <div className="fixed inset-0 bg-black/10 flex items-center justify-center z-50">
-                            <div className="relative bg-white p-6 rounded-xl shadow-lg w-[90%] max-w-md">
-                              {/* Close Button inside modal */}
-                              <button
-                                onClick={() => {
-                                  setIsProjectModalOpen(false);
-                                  setEditProject(null);
-                                }}
-                                className="absolute -top-2  cursor-pointer -right-2 bg-violet-200 rounded-full w-8 h-8 flex items-center justify-center text-gray-700 hover:bg-gray-300"
-                              >
-                                <X size={18} />
-                              </button>
-
-                              <AddProjectModal
-                                initialProject={editProject || undefined}
-                                onClose={() => {
-                                  setIsProjectModalOpen(false);
-                                  setEditProject(null);
-                                }}
-                                onProjectAdded={(newProject) => {
-                                  if (editProject) {
-                                    setProjects((prev) =>
-                                      prev.map((p) =>
-                                        p._id === newProject._id
-                                          ? newProject
-                                          : p
-                                      )
-                                    );
-                                  } else {
-                                    setProjects((prev) => [
-                                      newProject,
-                                      ...prev,
-                                    ]);
-                                  }
-                                  setIsProjectModalOpen(false);
-                                  setEditProject(null);
-                                }}
-                              />
-                            </div>
-                          </div>
-                        )}
+                        {/* Modal logic removed and moved to ProjectCards.tsx */}
                       </div>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            {isDropdownOpen && dropdownPosition && (
+              <div
+                className="fixed z-[999] bg-white shadow-lg rounded-md border border-gray-200"
+                style={{
+                  top: dropdownPosition.top + 30, // Offset a bit from the button
+                  left: dropdownPosition.left,
+                }}
+                ref={dropdownRef}
+              >
+                <ActionDropdown
+                  onViewDetails={() => {
+                    setSelectedProjectId(isDropdownOpen);
+                    setIsDropdownOpen(null);
+                  }}
+                  onEditProject={() => {
+                    const project = currentProjects.find(
+                      (p) => p._id === isDropdownOpen
+                    );
+                    if (project) handleEdit(project);
+                  }}
+                  onAddTask={() => {
+                    console.log("TODO: open Add Task modal");
+                    setIsDropdownOpen(null);
+                  }}
+                  onDeleteProject={() => {
+                    onDeleteProject(isDropdownOpen);
+                    setIsDropdownOpen(null);
+                  }}
+                />
+              </div>
+            )}
           </div>
 
           {/* Mobile 2-Column Layout */}
@@ -268,11 +242,6 @@ export default function ListModeProjects() {
                     {project.title}
                   </button>
                 </div>
-                <ProjectDetails
-                  projectId={selectedSmProjectId}
-                  onClose={() => setSelectedSmProjectId(null)}
-                />
-
                 {/* Right col - Other info */}
                 <div className="space-y-1 text-sm text-gray-600">
                   <p>
@@ -302,62 +271,24 @@ export default function ListModeProjects() {
                     </button>
                     {isSmScreenDropdownOpen == project._id && (
                       <div
-                        className="absolute top-6 z-50 bg-white left-0"
+                        className="absolute top-6 z-50 bg-white left-0 shadow-lg rounded-md border border-gray-200"
                         ref={smDropdownRef}
                       >
                         <ActionDropdown
-                          onViewDetails={() =>
-                            setSelectedSmProjectId(project._id)
-                          }
-                          onEditProject={() => {
-                            setEditProject(project);
-                            setIsOpen(true);
+                          onViewDetails={() => {
+                            setSelectedProjectId(project._id);
+                            setIsSmScreenDropdownOpen(null);
                           }}
-                          onAddTask={() =>
-                            console.log("TODO: open Add Task modal")
-                          }
-                          onDeleteProject={() =>
-                            console.log("Delete project", project._id)
-                          }
+                          onEditProject={() => handleEdit(project)}
+                          onAddTask={() => {
+                            console.log("TODO: open Add Task modal");
+                            setIsSmScreenDropdownOpen(null);
+                          }}
+                          onDeleteProject={() => {
+                            onDeleteProject(project._id);
+                            setIsSmScreenDropdownOpen(null);
+                          }}
                         />
-                      </div>
-                    )}
-                    {/* Project Modal (New/Edit) */}
-                    {isOpen && (
-                      <div className="fixed inset-0 bg-black/10 flex items-center justify-center z-50">
-                        <div className="relative bg-white p-6 rounded-xl shadow-lg w-[90%] max-w-md">
-                          {/* Close Button inside modal */}
-                          <button
-                            onClick={() => {
-                              setIsOpen(false);
-                              setEditProject(null);
-                            }}
-                            className="absolute -top-2  cursor-pointer -right-2 bg-violet-200 rounded-full w-8 h-8 flex items-center justify-center text-gray-700 hover:bg-gray-300"
-                          >
-                            <X size={18} />
-                          </button>
-
-                          <AddProjectModal
-                            initialProject={editProject || undefined}
-                            onClose={() => {
-                              setIsOpen(false);
-                              setEditProject(null);
-                            }}
-                            onProjectAdded={(newProject) => {
-                              if (editProject) {
-                                setProjects((prev) =>
-                                  prev.map((p) =>
-                                    p._id === newProject._id ? newProject : p
-                                  )
-                                );
-                              } else {
-                                setProjects((prev) => [newProject, ...prev]);
-                              }
-                              setIsOpen(false);
-                              setEditProject(null);
-                            }}
-                          />
-                        </div>
                       </div>
                     )}
                   </div>
@@ -368,7 +299,13 @@ export default function ListModeProjects() {
         </>
       )}
 
-      {/* Pagination */}
+      {/* Project Details Modal (kept here for proximity to the button) */}
+      <ProjectDetails
+        projectId={selectedProjectId}
+        onClose={() => setSelectedProjectId(null)}
+      />
+
+      {/* Pagination (now uses props) */}
       <footer className="flex justify-between items-center mt-6 text-sm text-gray-600">
         <button
           onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
@@ -378,7 +315,7 @@ export default function ListModeProjects() {
           Prev
         </button>
 
-        {projects.length > 0 && (
+        {currentProjects.length > 0 && (
           <div className="flex gap-2">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
               <button

@@ -4,6 +4,8 @@ import Projects from "../controllers/ProjectsControllers"
 import { verifyToken } from "../middleware/authMiddleware";
 router.use(verifyToken);
 router.get("/",Projects.GetProjects );
+router.get("/stats",Projects.GetProjectsStats );
+router.get("/trashed",  Projects.GetTrashedProjects);
 router.post("/", Projects.CreateProject);
 router.get("/:id",Projects.GetOneProject);
 router.delete("/:id",Projects.DeleteProject);

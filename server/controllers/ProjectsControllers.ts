@@ -2,7 +2,49 @@ import { Request, Response } from "express";
 import ProjectsModel from "../models/ProjectsModel";
 import mongoose from "mongoose";
 
+//Get Stats
+export const GetProjectsStats = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
 
+    const now = new Date();
+    const startOfDay = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    );
+    const endOfDay = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + 1
+    );
+
+    const [totalCount, completedCount, inProgressCount, toDoCount, dueTodayCount] = await Promise.all([
+      ProjectsModel.countDocuments({ userId }),
+      ProjectsModel.countDocuments({ userId, status: "Completed" }),      
+      ProjectsModel.countDocuments({ userId, status: "In Progress" }),     
+      ProjectsModel.countDocuments({ userId, status: "To Do" }),          
+      ProjectsModel.countDocuments({
+        userId,
+        dueDate: { $gte: startOfDay, $lt: endOfDay },
+      }),
+    ]);
+
+    res.status(200).json({
+      totalCount,
+      completedCount,
+      inProgressCount,
+      pendingCount: toDoCount, 
+      dueTodayCount,
+    });
+  } catch (error: any) {
+    console.error("❌ Error fetching task stats:", error);
+    res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+};
 // Get all projects
 const GetProjects = async (req: Request, res: Response) => {
   try {
@@ -28,9 +70,10 @@ const GetProjects = async (req: Request, res: Response) => {
       },
       
       {
-        $addFields: {
-          totaltasks: { $size: "$tasks" },
-        },
+       $addFields: {
+  totalTasks: { $size: "$tasks" },
+}
+
       },
       {
         $project: {
@@ -136,16 +179,31 @@ const DeleteProject = async (req: Request, res: Response) => {
     res.status(500).json({ error: error.message });
   }
 };
+// Get all trashed projects
+const GetTrashedProjects = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.id;
+
+    const trashedProjects = await ProjectsModel.find({ userId, isTrashed: true });
+
+    if (!trashedProjects || trashedProjects.length === 0) {
+      return res.status(404).json({ message: "No trashed projects found" });
+    }
+
+    res.status(200).json(trashedProjects);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 // move to trash
 export const MoveToTrash = async (req: Request, res: Response) => {
   try {
     const project = await ProjectsModel.findByIdAndUpdate(
       req.params.id,
-      { isTrashed: true },
+      { isTrashed: true, deletedOn: new Date() }, 
       { new: true }
     );
-
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
@@ -161,7 +219,7 @@ const RestoreProject = async (req: Request, res: Response) => {
   try {
     const project = await ProjectsModel.findByIdAndUpdate(
       req.params.id,
-      { isTrashed: false },
+      { isTrashed: false, deletedOn: null }, 
       { new: true }
     );
     if (!project) return res.status(404).json({ message: "Project not found" });
@@ -178,5 +236,7 @@ export default {
   UpdateProject,
   DeleteProject,
   MoveToTrash,
-  RestoreProject
+  RestoreProject,
+  GetProjectsStats,
+  GetTrashedProjects
 };

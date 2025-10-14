@@ -1,6 +1,52 @@
 import { Request, Response } from "express";
+
 import TasksModel from "../models/TasksModel";
+import ProjectsModel from "../models/ProjectsModel";
 console.log("✅ TasksRoutes loaded");
+
+export const GetTaskStats = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const now = new Date();
+    const startOfDay = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    );
+    const endOfDay = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + 1
+    );
+
+    const [totalCount, completedCount, inProgressCount, toDoCount, dueTodayCount] = await Promise.all([
+      TasksModel.countDocuments({ userId }),
+      TasksModel.countDocuments({ userId, status: "completed" }),       // ✅ lowercase
+      TasksModel.countDocuments({ userId, status: "in progress" }),     // ✅ space and lowercase
+      TasksModel.countDocuments({ userId, status: "to do" }),           // ✅ renamed from 'pending'
+      TasksModel.countDocuments({
+        userId,
+        dueDate: { $gte: startOfDay, $lt: endOfDay },
+      }),
+    ]);
+
+    res.status(200).json({
+      totalCount,
+      completedCount,
+      inProgressCount,
+      pendingCount: toDoCount, // Renamed for UI clarity
+      dueTodayCount,
+    });
+  } catch (error: any) {
+    console.error("❌ Error fetching task stats:", error);
+    res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+};
+
 
 export const GetAllTasks = async (req: Request, res: Response) => {
   try {
@@ -13,19 +59,26 @@ export const GetAllTasks = async (req: Request, res: Response) => {
 };
 
 const CreateTask = async (req: Request, res: Response) => {
-  console.log("📩 CreateTask called with body:", req.body);
   try {
-    const userId = (req as any).user.id; 
-    
-console.log("🧠 userId from token:", userId);
+    const userId = (req as any).user.id; // from verifyToken
+    const { title, description, status, priority, dueDate, projectId } = req.body;
 
-    const task = new TasksModel({
-      ...req.body,
-      userId, 
+    // ensure project exists & belongs to same user
+    const project = await ProjectsModel.findOne({ _id: projectId, userId });
+    if (!project) return res.status(404).json({ message: "Project not found or unauthorized" });
+
+    const newTask = await TasksModel.create({
+      title,
+      description,
+      status,
+      priority,
+      dueDate,
+      projectId,
+      userId,
     });
-
-    await task.save();
-    res.status(201).json(task);
+ const io = req.app.get("io");
+    io.emit("task_created", newTask);
+    res.status(201).json(newTask);
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
@@ -50,6 +103,8 @@ const UpdateTask = async (req: Request, res: Response) => {
     if (!task) {
       return res.status(404).json({ message: "Task not found" });
     }
+     const io = req.app.get("io");
+    io.emit("task_updated", task);
     res.status(200).json(task);
   } catch (error: any) {
     res.status(400).json({ error: error.message });
@@ -62,7 +117,10 @@ const DeleteTask = async (req: Request, res: Response) => {
     if (!task) {
       return res.status(404).json({ message: "Task not found" });
     }
+      const io = req.app.get("io");
+    io.emit("task_deleted", req.params.id);
     res.status(200).json({ message: "Task deleted successfully", task });
+    
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }
@@ -95,4 +153,4 @@ const recentTasks = await TasksModel.find({ userId })
   }
 };
 
-export default { GetAllTasks, CreateTask, GetOneTask, UpdateTask, DeleteTask , UpdateAllTasks , getRecentTasks};
+export default { GetAllTasks, CreateTask, GetOneTask, UpdateTask, DeleteTask , UpdateAllTasks , getRecentTasks, GetTaskStats};
