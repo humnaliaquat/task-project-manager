@@ -10,6 +10,9 @@ import bodyParser from "body-parser";
 import AuthRouter from "./routes/AuthRouter";
 import ProjectsRoutes from "./routes/ProjectsRoutes";
 import TasksRoutes from "./routes/TasksRoutes";
+import UserRoutes from "./routes/UserRouter";
+import ProfileRoutes from "./routes/ProfileRoutes";
+import AccountRoutes from "./routes/AccountRoutes";
 import AssignedTasksRoutes from "./routes/AssignedTasks";
 
 // DB connection
@@ -67,6 +70,9 @@ app.use("/auth", AuthRouter);
 app.use("/projects", ProjectsRoutes);
 app.use("/tasks", TasksRoutes);
 app.use("/assigned", AssignedTasksRoutes);
+app.use("/user", UserRoutes);
+app.use("/profile", ProfileRoutes);
+app.use("/account", AccountRoutes);
 
 // Default home route
 app.get("/", (req: Request, res: Response) => {

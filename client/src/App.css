@@ -1,10 +1,28 @@
 @import "tailwindcss";
-body{
-  background-color: #ffffff;
-}
+
 :root {
   --font-heading: 'Poppins', sans-serif;
   --font-body: 'Inter', sans-serif;
+  /* Light theme */
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --text-primary: #0f172a; /* slate-900 */
+  --text-secondary: #64748b; /* slate-500 */
+  --border-color: #e5e7eb; /* gray-200 */
+  --muted: #f8fafc; /* slate-50 */
+  --chip-bg: #f3e8ff; /* violet-50 */
+  --icon: #4b5563; /* gray-600 */
+}
+html.dark{
+  /* Dark theme overrides */
+  --bg: #151518;
+  --surface: #303030; /* gray-900 */
+  --text-primary: #f3f4f6; /* gray-100 */
+  --text-secondary: #9ca3af; /* gray-400 */
+  --border-color: #374151; /* gray-700 */
+  --muted: #0b1220;
+  --chip-bg: #1f2937; /* gray-800 */
+  --icon: #cbd5e1; /* slate-300 */
 }
 /* For Chrome, Edge, Safari */
 ::-webkit-scrollbar {
@@ -43,6 +61,7 @@ body, p, span, button, input {
   --rdp-accent-color: #8b5cf6; 
   --rdp-accent-background-color: #f0f0f0; 
 }
+
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }

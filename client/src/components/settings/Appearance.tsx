@@ -1,6 +1,7 @@
-import React from "react";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function Appearance() {
+  const { theme, setTheme } = useTheme();
   const colors = [
     { name: "Violet", color: "bg-violet-500" },
     { name: "Pink", color: "bg-pink-500" },
@@ -51,11 +52,21 @@ export default function Appearance() {
 
         <div className="flex gap-4">
           <div className="flex flex-col items-center border-2 cursor-pointer border-gray-300 rounded-xl p-4 w-32 hover:border-violet-500 transition">
-            <div className="w-full h-16 bg-gray-100 rounded-md mb-2"></div>
+            <button
+              onClick={() => setTheme("light")}
+              className={`w-full h-16 bg-gray-700 rounded-md mb-2 ${
+                theme === "light" ? "ring-2 ring-violet-500" : ""
+              }`}
+            ></button>
             <span className="text-sm text-gray-600">Light</span>
           </div>
           <div className="flex cursor-pointer flex-col items-center border-2 border-gray-300 rounded-xl p-4 w-32 bg-gray-900 hover:border-violet-500 transition">
-            <div className="w-full h-16 bg-gray-700 rounded-md mb-2"></div>
+            <button
+              onClick={() => setTheme("dark")}
+              className={`w-full h-16 bg-gray-700 rounded-md mb-2 ${
+                theme === "dark" ? "ring-2 ring-violet-500" : ""
+              }`}
+            ></button>
             <span className="text-sm text-white">Dark</span>
           </div>
         </div>
