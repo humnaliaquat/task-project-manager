@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 
 import TasksModel from "../models/TasksModel";
 import ProjectsModel from "../models/ProjectsModel";
+import { createNotification } from "./NotificationsController";
 console.log("✅ TasksRoutes loaded");
 
 export const GetTaskStats = async (req: Request, res: Response) => {
@@ -76,7 +77,17 @@ const CreateTask = async (req: Request, res: Response) => {
       projectId,
       userId,
     });
- const io = req.app.get("io");
+
+    // Create notification for task creation
+    await createNotification(
+      userId,
+      'task_created',
+      'New Task Created',
+      `Task "${newTask.title}" has been created in project "${project.title}".`,
+      newTask._id.toString()
+    );
+
+    const io = req.app.get("io");
     io.emit("task_created", newTask);
     res.status(201).json(newTask);
   } catch (error: any) {
@@ -103,7 +114,17 @@ const UpdateTask = async (req: Request, res: Response) => {
     if (!task) {
       return res.status(404).json({ message: "Task not found" });
     }
-     const io = req.app.get("io");
+
+    // Create notification for task update
+    await createNotification(
+      task.userId.toString(),
+      'task_updated',
+      'Task Updated',
+      `Task "${task.title}" has been updated.`,
+      task._id.toString()
+    );
+
+    const io = req.app.get("io");
     io.emit("task_updated", task);
     res.status(200).json(task);
   } catch (error: any) {
@@ -117,7 +138,17 @@ const DeleteTask = async (req: Request, res: Response) => {
     if (!task) {
       return res.status(404).json({ message: "Task not found" });
     }
-      const io = req.app.get("io");
+
+    // Create notification for task deletion
+    await createNotification(
+      task.userId.toString(),
+      'task_deleted',
+      'Task Deleted',
+      `Task "${task.title}" has been deleted.`,
+      task._id.toString()
+    );
+
+    const io = req.app.get("io");
     io.emit("task_deleted", req.params.id);
     res.status(200).json({ message: "Task deleted successfully", task });
     

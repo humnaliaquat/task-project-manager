@@ -38,10 +38,10 @@ export default function DashboardHeader({
 
   return (
     <header
-      className="sticky top-0 z-40 p-4 flex justify-between items-center"
+      className="sticky top-0 z-40 m-0 p-4 pt-2 pb-2 flex justify-between items-center backdrop-blur-[var(--blur)] bg-[var(--glass-bg)] border-b border-[var(--border)]"
       style={{
         backgroundColor: "var(--surface)",
-        borderBottom: "1px solid var(--border-color)",
+
         color: "var(--text-primary)",
       }}
     >

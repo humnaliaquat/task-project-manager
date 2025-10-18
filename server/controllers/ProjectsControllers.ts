@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import ProjectsModel from "../models/ProjectsModel";
 import mongoose from "mongoose";
+import { createNotification } from "./NotificationsController";
 
 //Get Stats
 export const GetProjectsStats = async (req: Request, res: Response) => {
@@ -106,6 +107,15 @@ const CreateProject = async (req: Request, res: Response) => {
 
     await project.save();
 
+    // Create notification for project creation
+    await createNotification(
+      userId,
+      'project_created',
+      'New Project Created',
+      `Project "${project.title}" has been created successfully.`,
+      project._id.toString()
+    );
+
     res.status(201).json(project);
   } catch (error: any) {
     console.error("Error creating project:", error);
@@ -161,6 +171,16 @@ const UpdateProject = async (req: Request, res: Response) => {
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
+
+    // Create notification for project update
+    await createNotification(
+      project.userId.toString(),
+      'project_updated',
+      'Project Updated',
+      `Project "${project.title}" has been updated.`,
+      project._id.toString()
+    );
+
     res.status(200).json(project);
   } catch (err: any) {
     res.status(400).json({ error: err.message });
@@ -174,6 +194,16 @@ const DeleteProject = async (req: Request, res: Response) => {
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
+
+    // Create notification for project deletion
+    await createNotification(
+      project.userId.toString(),
+      'project_deleted',
+      'Project Deleted',
+      `Project "${project.title}" has been deleted.`,
+      project._id.toString()
+    );
+
     res.status(200).json({ message: "Project deleted successfully", project });
   } catch (error: any) {
     res.status(500).json({ error: error.message });

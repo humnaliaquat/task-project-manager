@@ -118,13 +118,13 @@ export default function BoardView({ tasks, loading, setTasks }: Props) {
           return (
             <div
               key={col.id}
-              className="bg-gray-50 border border-gray-200 rounded-xl shadow-sm p-4 flex flex-col"
+              className="bg-[var(--cards-bg)] backdrop-blur-[var(--blur)] rounded-xl shadow-sm p-4 flex flex-col"
             >
               {/* Column Header */}
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <span className={`w-3 h-3 rounded-full ${col.dot}`}></span>
-                  <h2 className="font-semibold text-gray-800">{col.title}</h2>
+                  <h2 className="font-semibold ">{col.title}</h2>
                 </div>
                 <div className="flex items-center gap-2">
                   <input
@@ -172,7 +172,7 @@ export default function BoardView({ tasks, loading, setTasks }: Props) {
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
-                              className={`bg-white rounded-lg shadow-sm border border-gray-200 p-3 border-l-4 ${
+                              className={`bg-[var(--inside-card-bg)] rounded-lg shadow-sm border border-[var(--border)] p-3 border-l-4 ${
                                 col.color
                               } ${
                                 snapshot.isDragging

@@ -4,14 +4,20 @@ import ViewsCombined from "../components/tasks/ViewsCombined";
 
 export default function TasksPage() {
   return (
-    <div className="min-h-screen rounded-2xl ">
+    <div
+      className="min-h-screen    "
+      style={{
+        backgroundColor: "var(--bg)",
+        color: "var(--text-primary)",
+      }}
+    >
       <DashboardHeader
         title="Tasks"
         subtitle="Create, track, and manage all your tasks easily"
         showSearch={false}
       />
       <TasksOverview />
-      <div className="flex w-full gap-4 p-4 pt-0 ">
+      <div className="flex w-full gap-4 p-4 pt-0 pb-0 ">
         <ViewsCombined />
       </div>
     </div>

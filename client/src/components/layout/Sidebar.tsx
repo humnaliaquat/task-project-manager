@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useSidebarStore } from "../../store/useSidebarStore";
+import NotificationsDropdown from "../notifications/NotificationsDropdown";
 
 type SidebarProps = {
   setIsOpen: (value: boolean) => void;
@@ -61,7 +62,7 @@ export default function Sidebar({ setIsOpen }: SidebarProps) {
       )}
 
       <div
-        className={`fixed md:sticky top-0 left-0 h-screen bg-violet-50 border-r border-gray-100 shadow-md flex flex-col justify-between transition-transform duration-300 z-50 w-64
+        className={`fixed md:sticky top-0 left-0 h-screen bg-[var(--sidebar-bg-color)]  shadow-md flex flex-col justify-between transition-transform duration-300 z-50 w-64
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
         ${isCollapsed ? "md:w-20" : "md:w-64"}
         md:translate-x-0`}
@@ -104,7 +105,7 @@ export default function Sidebar({ setIsOpen }: SidebarProps) {
           <div className="flex flex-col flex-1 overflow-y-auto">
             <div className="mb-8 pt-5">
               {!isCollapsed && (
-                <p className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-widest">
+                <p className="text-xs font-semibold text-white mb-2 uppercase tracking-widest">
                   Menu
                 </p>
               )}
@@ -227,64 +228,7 @@ export default function Sidebar({ setIsOpen }: SidebarProps) {
           </div>
         </div>
       </div>
-      {isNotificationsOpen && (
-        <>
-          {/* Optional overlay to close dropdown on outside click */}
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setIsNotificationsOpen(false)}
-          />
-
-          <div
-            className={`fixed top-6 bottom-6 h-auto w-80 bg-white border border-gray-200 shadow-xl rounded-xl z-50 overflow-hidden
-        transition-transform duration-300 ease-in-out
-        ${isCollapsed ? "left-24" : "left-68"}
-        ${isOpen ? "translate-x-0" : "-translate-x-full"}
-        md:translate-x-0
-      `}
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 bg-violet-100 border-b border-gray-200">
-              <p className="font-semibold text-lg text-gray-800">
-                Notifications
-              </p>
-              <button
-                className="p-1.5 rounded-md hover:bg-violet-200 text-gray-600 transition"
-                onClick={() => setIsNotificationsOpen(false)}
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            {/* Body */}
-            <div className="flex-1 overflow-y-auto px-4 py-2 space-y-2">
-              {/* Each notification item */}
-              <div className="py-2 px-3 bg-gray-50 hover:bg-violet-50 rounded-md cursor-pointer transition">
-                ✅ Task Completed
-              </div>
-              <div className="py-2 px-3 hover:bg-violet-50 rounded-md cursor-pointer transition">
-                📆 Project deadline moved
-              </div>
-              <div className="py-2 px-3 hover:bg-violet-50 rounded-md cursor-pointer transition">
-                📝 New task assigned
-              </div>
-              <div className="py-2 px-3 hover:bg-violet-50 rounded-md cursor-pointer transition">
-                ✏️ Task updated
-              </div>
-
-              {/* Empty state (optional) */}
-              {/* <p className="text-sm text-gray-500 text-center py-4">No new notifications</p> */}
-            </div>
-
-            {/* Footer (optional actions) */}
-            <div className="border-t border-gray-100 bg-white px-4 py-2 flex justify-end">
-              <button className="text-sm text-violet-600 hover:underline font-medium">
-                Mark all as read
-              </button>
-            </div>
-          </div>
-        </>
-      )}
+      {isNotificationsOpen && <NotificationsDropdown />}
     </>
   );
 }

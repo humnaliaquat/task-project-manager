@@ -89,7 +89,7 @@ export default function ViewsCombined() {
   }, []);
 
   return (
-    <div className="p-4  rounded-2xl flex flex-col w-full bg-white border border-gray-200 ">
+    <div className="p-4  rounded-2xl flex flex-col w-full  border border-[var(--border)] ">
       <header className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-4">
         {/* Search */}
         <div className="relative w-full sm:w-64">

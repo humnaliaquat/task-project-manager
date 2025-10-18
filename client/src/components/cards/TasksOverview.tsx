@@ -59,12 +59,12 @@ export default function TasksOverview() {
         {collection.map((item, index) => (
           <div
             key={index}
-            className="p-1.5 flex flex-col items-center justify-center border rounded-xl bg-white border-gray-200 "
+            className="p-1.5 flex flex-col items-center justify-center border rounded-xl  border-[var(--border)] bg-[var(--cards-bg)] backdrop-blur-[var(--blur)] "
           >
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 text-center">
+            <p className="text-sm font-medium  text-[var(--light-text)] text-center">
               {item.name}
             </p>
-            <p className="text-xl font-bold text-gray-900 dark:text-white mt-2">
+            <p className="text-xl font-bold  dark:text-white mt-2">
               {item.count}
             </p>
           </div>
