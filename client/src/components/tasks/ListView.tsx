@@ -32,7 +32,7 @@ function TaskColumn({ title, tasks }: ColumnProps) {
       : "bg-green-500";
 
   return (
-    <div className="w-full flex flex-col gap-3 p-4 border border-gray-200 rounded-2xl ">
+    <div className="w-full flex flex-col gap-3 p-4 border border-[var(--border)] rounded-2xl ">
       {/* Header */}
       <header className="flex justify-between items-center">
         <div className="flex gap-2 items-center">
@@ -41,7 +41,7 @@ function TaskColumn({ title, tasks }: ColumnProps) {
           <button className="font-semibold">{title}</button>
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="text-gray-500 hover:text-gray-700 cursor-pointer transition-transform"
+            className="text-[var(--light-text)] hover:text-gray-700 cursor-pointer transition-transform"
           >
             <ChevronDown
               size={16}
@@ -61,7 +61,7 @@ function TaskColumn({ title, tasks }: ColumnProps) {
         <main className="overflow-x-auto animate-fadeIn">
           <table className="w-full border-collapse text-sm">
             <thead>
-              <tr className="bg-gray-100 text-gray-700">
+              <tr className="bg-[var(--inside-card-bg)] text-[var(--light-text)] ">
                 <th className="p-2 text-center">
                   <input
                     type="checkbox"
@@ -79,9 +79,13 @@ function TaskColumn({ title, tasks }: ColumnProps) {
                 <tr
                   key={task._id}
                   className={`text-center ${
-                    i % 2 === 0 ? "bg-white" : "bg-violet-50"
+                    i % 2 === 0
+                      ? "bg-[var(--bg)]"
+                      : "bg-[var(--inside-card-bg)]"
                   } ${
-                    i === tasks.length - 1 ? "" : "border-b border-gray-200"
+                    i === tasks.length - 1
+                      ? ""
+                      : "border-b border-[var(--border)]"
                   }`}
                 >
                   <td className="p-2">
@@ -117,7 +121,7 @@ function TaskColumn({ title, tasks }: ColumnProps) {
                   </td>
 
                   <td className="p-2">
-                    <button className="text-gray-500 hover:text-gray-700 cursor-pointer">
+                    <button className="text-[var(--light-text)] hover:text-gray-700 cursor-pointer">
                       <MoreHorizontal size={16} />
                     </button>
                   </td>

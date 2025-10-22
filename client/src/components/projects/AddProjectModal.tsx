@@ -126,11 +126,14 @@ export default function AddProjectModal({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-4 w-full max-w-md  rounded-xl bg-white"
+      className="flex flex-col gap-4 w-full max-w-md  rounded-xl bg-[var(--bg)]"
     >
       {/* Title */}
       <div className="flex flex-col gap-1 w-full">
-        <label htmlFor="title" className="text-sm font-medium text-gray-700">
+        <label
+          htmlFor="title"
+          className="text-sm font-medium text-[var(--primary-text)] "
+        >
           Project Title
         </label>
         <input
@@ -140,7 +143,7 @@ export default function AddProjectModal({
           value={project.title}
           onChange={(e) => setProject({ ...project, title: e.target.value })}
           placeholder="Enter project title"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-none focus:ring-violet-500"
+          className="w-full px-3 py-2 border border-[var(--border)] rounded-lg focus:outline-none focus:ring-none focus:ring-violet-500"
         />
       </div>
 
@@ -148,7 +151,7 @@ export default function AddProjectModal({
       <div className="flex flex-col gap-1 w-full">
         <label
           htmlFor="description"
-          className="text-sm font-medium text-gray-700"
+          className="text-sm font-medium text-[var(--primary-text)] "
         >
           Project Description
         </label>
@@ -159,7 +162,7 @@ export default function AddProjectModal({
             setProject({ ...project, description: e.target.value })
           }
           placeholder="Enter project details..."
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-none focus:ring-violet-500"
+          className="w-full px-3 py-2 border border-[var(--border)] rounded-lg resize-none focus:outline-none focus:ring-none focus:ring-violet-500"
           rows={3}
         />
       </div>
@@ -169,7 +172,7 @@ export default function AddProjectModal({
         <div className="flex flex-col gap-1">
           <label
             htmlFor="incharge"
-            className="text-sm font-medium text-gray-700"
+            className="text-sm font-medium text-[var(--primary-text)] "
           >
             Incharge Name
           </label>
@@ -182,11 +185,14 @@ export default function AddProjectModal({
               setProject({ ...project, inChargeName: e.target.value })
             }
             placeholder="Enter incharge name"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-none focus:ring-violet-500"
+            className="w-full px-3 py-2 border border-[var(--border)] rounded-lg focus:outline-none focus:ring-none focus:ring-violet-500"
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label htmlFor="role" className="text-sm font-medium text-gray-700">
+          <label
+            htmlFor="role"
+            className="text-sm font-medium text-[var(--primary-text)] "
+          >
             Incharge Role
           </label>
           <input
@@ -196,7 +202,7 @@ export default function AddProjectModal({
             value={project.role}
             onChange={(e) => setProject({ ...project, role: e.target.value })}
             placeholder="Enter incharge role"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-none focus:ring-violet-500"
+            className="w-full px-3 py-2 border border-[var(--border)] rounded-lg focus:outline-none focus:ring-none focus:ring-violet-500"
           />
         </div>
       </div>
@@ -205,23 +211,26 @@ export default function AddProjectModal({
       <div className="flex flex-col sm:flex-row gap-4 w-full">
         {/* Status Dropdown */}
         <div className="flex flex-col gap-1 w-full relative">
-          <label htmlFor="status" className="text-sm font-medium text-gray-700">
+          <label
+            htmlFor="status"
+            className="text-sm font-medium text-[var(--primary-text)] "
+          >
             Status <span className="text-red-500">*</span>
           </label>
           <button
             id="status"
             type="button"
             onClick={() => setIsStatusOpen(!isStatusOpen)}
-            className={`w-full flex items-center justify-between px-3 py-2 border cursor-pointer border-gray-300 rounded-lg bg-white ${
-              status ? "text-gray-700" : "text-gray-400"
+            className={`w-full flex items-center justify-between px-3 py-2 border cursor-pointer border-[var(--border)] rounded-lg bg-[var(--cards-bg)] ${
+              status ? "text-[var(--primary-text)]" : "text-[var(--light-text)]"
             }  focus:ring-none focus:ring-violet-500`}
             aria-label="Select status"
           >
             {status || "Select status"}
-            <ChevronDown size={16} className="text-gray-500" />
+            <ChevronDown size={16} className="text-[var(--light-text)]" />
           </button>
           {isStatusOpen && (
-            <div className="absolute z-20 top-16 right-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg">
+            <div className="absolute z-20 top-16 right-0 mt-1 w-full bg-[var(--bg)] border border-[var(--border)] rounded-lg shadow-lg">
               {["To Do", "In Progress", "Completed"].map((s) => (
                 <div
                   key={s}
@@ -229,7 +238,7 @@ export default function AddProjectModal({
                     setStatus(s);
                     setIsStatusOpen(false);
                   }}
-                  className="px-3 py-2 text-sm text-gray-700 hover:bg-violet-50 cursor-pointer"
+                  className="px-3 py-2 text-sm text-[var(--primary-text)] hover:bg-[var(--hover-bg)] cursor-pointer"
                 >
                   {s}
                 </div>
@@ -242,23 +251,25 @@ export default function AddProjectModal({
         <div className="flex flex-col gap-1 w-full relative">
           <label
             htmlFor="dueDate"
-            className="text-sm font-medium text-gray-700"
+            className="text-sm font-medium text-[var(--primary-text)] "
           >
             Due Date <span className="text-red-500">*</span>
           </label>
           <button
             type="button"
             onClick={() => setIsCalendarOpen(!isCalendarOpen)}
-            className={`w-full flex items-center justify-between  cursor-pointer px-3 py-2 border border-gray-300 rounded-lg bg-white ${
-              selected ? "text-gray-700" : "text-gray-400"
+            className={`w-full flex items-center justify-between  cursor-pointer px-3 py-2 border border-[var(--border)] rounded-lg bg-[var(--cards-bg)] ${
+              selected
+                ? "text-[var(--primary-text)]"
+                : "text-[var(--light-text)]"
             }  focus:ring-none focus:ring-violet-500`}
             aria-label="Select due date"
           >
             {selected ? formatDate(selected) : "Select a date"}
-            <ChevronDown size={16} className="text-gray-500" />
+            <ChevronDown size={16} className="text-[var(--light-text)]" />
           </button>
           {isCalendarOpen && (
-            <div className="absolute z-30 -top-34  bg-white border border-gray-200 rounded-xl shadow-lg p-3 min-w-[280px]">
+            <div className="absolute z-30 -top-34  bg-[var(--bg)] border border-[var(--border)] rounded-xl shadow-lg p-3 min-w-[280px]">
               <DayPicker
                 mode="single"
                 selected={selected || undefined}
@@ -283,7 +294,10 @@ export default function AddProjectModal({
       </div>
       {/* Priority Dropdown */}
       <div className="flex flex-col gap-1 w-full relative">
-        <label htmlFor="priority" className="text-sm font-medium text-gray-700">
+        <label
+          htmlFor="priority"
+          className="text-sm font-medium text-[var(--primary-text)] "
+        >
           Priority <span className="text-red-500">*</span>
         </label>
         <button
@@ -291,15 +305,19 @@ export default function AddProjectModal({
           type="button"
           onClick={() => setIsPriorityOpen(!isPriorityOpen)}
           className={`w-full flex items-center cursor-pointer justify-between px-3 py-2 border 
-                border-gray-300 rounded-lg bg-white 
-                ${priority ? "text-gray-700" : "text-gray-400"}
+                border-[var(--border)] rounded-lg bg-[var(--cards-bg)]
+                ${
+                  priority
+                    ? "text-[var(--primary-text)]"
+                    : "text-[var(--light-text)]"
+                }
                  focus:ring-none focus:ring-violet-500`}
         >
           {priority || "Select priority"}
-          <ChevronDown size={16} className="text-gray-500" />
+          <ChevronDown size={16} className="text-[var(--light-text)]" />
         </button>
         {isPriorityOpen && (
-          <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg">
+          <div className="absolute z-10 mt-1 w-full bg-[var(--bg)] border border-[var(--border)] rounded-lg shadow-lg">
             {["Low", "Medium", "High"].map((p) => (
               <div
                 key={p}
@@ -307,7 +325,7 @@ export default function AddProjectModal({
                   setPriority(p);
                   setIsPriorityOpen(false);
                 }}
-                className="px-3 py-2 text-sm text-gray-700  cursor-pointer"
+                className="px-3 py-2 text-sm text-[var(--primary-text)]  cursor-pointer"
               >
                 {p}
               </div>
@@ -320,7 +338,7 @@ export default function AddProjectModal({
       <div className="flex justify-end gap-3 mt-4">
         <button
           type="button"
-          className="px-4 py-2 rounded-lg text-sm border border-gray-300 hover:bg-gray-100 cursor-pointer"
+          className="px-4 py-2 rounded-lg text-sm border border-[var(--border)] hover:bg-[var(--hover-bg)] cursor-pointer"
           onClick={onClose}
         >
           Cancel

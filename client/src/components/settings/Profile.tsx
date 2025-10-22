@@ -17,7 +17,10 @@ function Input({
 }: any) {
   return (
     <div className="flex flex-col gap-1">
-      <label htmlFor={name} className="text-sm font-medium text-gray-700">
+      <label
+        htmlFor={name}
+        className="text-sm font-medium text-[var(--primary-text)] "
+      >
         {label}
       </label>
       <input
@@ -28,7 +31,7 @@ function Input({
         readOnly={readOnly}
         onChange={onChange}
         placeholder={placeholder}
-        className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-violet-500"
+        className="border border-[var(--border)] rounded-lg px-3 py-2 focus:outline-none focus:border-violet-500"
       />
     </div>
   );
@@ -154,11 +157,11 @@ export default function Profile() {
       // Optionally update local cached user profile for display elsewhere
       const existing = JSON.parse(localStorage.getItem("authUser") || "null");
       if (existing) {
-        localStorage.setItem(
-          "authUser",
-          JSON.stringify({ ...existing, ...data.user })
-        );
+        const safeUser = { ...existing, ...data.user };
+        delete safeUser.profilePic;
+        localStorage.setItem("authUser", JSON.stringify(safeUser));
       }
+
       toast.success("Profile saved successfully");
     } catch (err: any) {
       toast.error(err.message || "Failed to save profile");
@@ -214,11 +217,11 @@ export default function Profile() {
   };
 
   return (
-    <form className="m-4 border border-gray-200 rounded-2xl p-6 bg-white space-y-6">
+    <form className="m-4 border border-(--border) rounded-2xl p-6 space-y-6 bg-[var(--cards-bg)] ">
       {/* Title */}
       <div>
-        <p className="text-xl font-semibold text-gray-900">Profile</p>
-        <p className="text-sm text-gray-500">
+        <p className="text-xl font-semibold ">Profile</p>
+        <p className="text-sm text-[var(--light-text)] ">
           Update your personal information and profile details
         </p>
       </div>
@@ -229,10 +232,10 @@ export default function Profile() {
           <img
             src={formData.profilePic}
             alt="Profile"
-            className="w-24 h-24 rounded-full border-4 border-white shadow-md object-cover"
+            className="w-24 h-24 rounded-full border-4 border-[var(--border)] shadow-md object-cover"
           />
         ) : (
-          <span className="w-24 h-24 bg-violet-500 border-4 border-white rounded-full shadow-md flex items-center justify-center text-white text-xl font-semibold">
+          <span className="w-24 h-24 bg-violet-500 border-4 border-[var(--border)] rounded-full shadow-md flex items-center justify-center text-white text-xl font-semibold">
             {formData.firstName
               ? formData.firstName[0].toUpperCase() +
                 (formData.lastName ? formData.lastName[0].toUpperCase() : "")
@@ -258,7 +261,7 @@ export default function Profile() {
             <button
               type="button"
               onClick={handleDeletePic}
-              className="border border-gray-300 hover:bg-gray-100 px-3 py-1.5 rounded text-sm transition"
+              className="border border-[var(--border)] hover:bg-[var(--hover-bg)] px-3 py-1.5 rounded text-sm transition"
             >
               Delete Picture
             </button>
@@ -296,7 +299,7 @@ export default function Profile() {
         <div className="flex flex-col gap-1 relative">
           <label
             htmlFor="password"
-            className="text-sm font-medium text-gray-700"
+            className="text-sm font-medium text-[var(--light-text)] "
           >
             Password
           </label>
@@ -309,12 +312,12 @@ export default function Profile() {
               value={formData.password}
               onChange={handleChange}
               placeholder="•••••••"
-              className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:border-violet-500 pr-10"
+              className="border border-[var(--border)] rounded-lg px-3 py-2 w-full focus:outline-none focus:border-violet-500 pr-10"
             />
             <button
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute inset-y-0 right-3 flex items-center text-gray-500 cursor-pointer hover:text-violet-500"
+              className="absolute inset-y-0 right-3 flex items-center text-[var(--light-text)] cursor-pointer hover:text-violet-500"
             >
               {showPassword ? (
                 <EyeOff className="w-5 h-5" />
@@ -336,7 +339,10 @@ export default function Profile() {
 
       {/* Bio */}
       <div className="flex flex-col gap-1">
-        <label htmlFor="bio" className="text-sm font-medium text-gray-700">
+        <label
+          htmlFor="bio"
+          className="text-sm font-medium text-[var(--primary-text)] "
+        >
           Bio
         </label>
         <textarea
@@ -346,17 +352,17 @@ export default function Profile() {
           onChange={handleChange}
           rows={4}
           placeholder="Write something about yourself..."
-          className="border border-gray-300 rounded-lg px-3 py-2 resize-none focus:outline-none focus:border-violet-500"
+          className="border border-[var(--border)] rounded-lg px-3 py-2 resize-none focus:outline-none focus:border-violet-500"
         ></textarea>
       </div>
 
       {/* Buttons */}
-      <div className="pt-2 flex justify-end gap-3">
+      <div className="pt-2 flex justify-end gap-3 ">
         <button
           type="button"
           onClick={handleCancel}
           disabled={isLoading || isSaving}
-          className="w-full sm:w-auto border border-gray-300 hover:bg-gray-100 cursor-pointer px-6 py-2.5 rounded-lg font-medium transition"
+          className="w-full sm:w-auto border border-[var(--border)] hover:bg-[var(--hover-bg)] cursor-pointer px-6 py-2.5 rounded-lg font-medium transition"
         >
           {isLoading ? "Loading..." : "Cancel"}
         </button>

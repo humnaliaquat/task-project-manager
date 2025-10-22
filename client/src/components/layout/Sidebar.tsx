@@ -62,7 +62,7 @@ export default function Sidebar({ setIsOpen }: SidebarProps) {
       )}
 
       <div
-        className={`fixed md:sticky top-0 left-0 h-screen bg-[var(--sidebar-bg-color)]  shadow-md flex flex-col justify-between transition-transform duration-300 z-50 w-64
+        className={`fixed md:sticky top-0 left-0 h-screen bg-[var(--sidebar-bg-color)]  shadow-md flex flex-col justify-between transition-transform duration-300 z-50 text-[var(--sidebar-links-color)] w-64
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
         ${isCollapsed ? "md:w-20" : "md:w-64"}
         md:translate-x-0`}
@@ -75,8 +75,8 @@ export default function Sidebar({ setIsOpen }: SidebarProps) {
                 isCollapsed ? "md:w-0 md:opacity-0 " : "w-auto opacity-100"
               }`}
             >
-              <p className="font-medium text-xl text-slate-900 whitespace-nowrap">
-                Planora
+              <p className="font-medium text-xl text-[var(--primary-text)] whitespace-nowrap">
+                PLANORA
               </p>
             </div>
             <div className="relative">
@@ -105,7 +105,7 @@ export default function Sidebar({ setIsOpen }: SidebarProps) {
           <div className="flex flex-col flex-1 overflow-y-auto">
             <div className="mb-8 pt-5">
               {!isCollapsed && (
-                <p className="text-xs font-semibold text-white mb-2 uppercase tracking-widest">
+                <p className="text-xs font-semibold text-[var(--primary-text)] mb-2 uppercase tracking-widest">
                   Menu
                 </p>
               )}
@@ -139,7 +139,7 @@ export default function Sidebar({ setIsOpen }: SidebarProps) {
                       className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all ${
                         isActive
                           ? "bg-violet-200 text-violet-600"
-                          : "text-gray-600 hover:bg-gray-100"
+                          : "text-[var(--sidebar-links-color)]  hover:bg-[var(--sidebar-links-hover)] "
                       }`}
                     >
                       {content}
@@ -151,7 +151,7 @@ export default function Sidebar({ setIsOpen }: SidebarProps) {
                           item.onClick?.();
                           setIsOpen(false);
                         }}
-                        className="flex items-center w-full px-3 py-2 rounded-md text-sm font-medium cursor-pointer text-gray-600 hover:bg-gray-100 transition-all"
+                        className="flex items-center w-full px-3 py-2 rounded-md text-sm font-medium cursor-pointer text-[vartext-[var(--sidebar-links-color)]  hover:bg-[var(--sidebar-links-hover)] transition-all"
                       >
                         {content}
                       </button>
@@ -164,7 +164,7 @@ export default function Sidebar({ setIsOpen }: SidebarProps) {
             {/* General */}
             <div>
               {!isCollapsed && (
-                <p className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-widest">
+                <p className="text-xs font-semibold text-[var(--light-text)] mb-2 uppercase tracking-widest">
                   General
                 </p>
               )}
@@ -180,7 +180,7 @@ export default function Sidebar({ setIsOpen }: SidebarProps) {
                           navigate("/login");
                           setIsOpen(false);
                         }}
-                        className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100 transition-all"
+                        className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-[var(--sidebar-links-color)] cursor-pointer hover:bg-[var(--sidebar-links-hover)] transition-all"
                       >
                         <div className="flex justify-center w-8">
                           <Icon className="h-5 w-5" />
@@ -205,7 +205,7 @@ export default function Sidebar({ setIsOpen }: SidebarProps) {
                       className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all ${
                         location.pathname === item.path
                           ? "bg-violet-200 text-violet-600"
-                          : "text-gray-600 hover:bg-gray-100"
+                          : "text-[var(--sidebar-links-color)]  hover:bg-[var(--sidebar-links-hover)]"
                       }`}
                     >
                       <div className="flex justify-center w-8">
@@ -228,7 +228,12 @@ export default function Sidebar({ setIsOpen }: SidebarProps) {
           </div>
         </div>
       </div>
-      {isNotificationsOpen && <NotificationsDropdown />}
+      {isNotificationsOpen && (
+        <NotificationsDropdown
+          collapsed={isCollapsed}
+          onClose={() => setIsNotificationsOpen(false)}
+        />
+      )}
     </>
   );
 }

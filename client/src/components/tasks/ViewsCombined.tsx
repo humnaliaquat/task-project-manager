@@ -93,13 +93,13 @@ export default function ViewsCombined() {
       <header className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-4">
         {/* Search */}
         <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--light-text)] " />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search task..."
-            className="border border-gray-300 pl-10 pr-3 py-2 rounded-xl w-full focus:ring-1 focus:ring-violet-400 outline-none text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
+            className="border border-[var(--border-color)] pl-10 pr-3 py-2 rounded-xl w-full focus:ring-1 focus:ring-violet-400 outline-none text-sm "
           />
         </div>
 
@@ -109,10 +109,10 @@ export default function ViewsCombined() {
           <div className="flex gap-2">
             <button
               onClick={() => handleViewChange("list")}
-              className={`flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm border rounded-xl cursor-pointer ${
+              className={`flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm border border-[var(--border)] rounded-xl cursor-pointer ${
                 viewMode === "list"
-                  ? "bg-violet-100 border-violet-400 text-violet-600"
-                  : "border-gray-300 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
+                  ? "bg-[var(--inside-card-bg)] border-violet-400 text-[var(--violet-text)] "
+                  : "border-[var(--border-color)] hover:bg-[var(--hover-bg)] "
               }`}
             >
               <List className="h-4 w-4" />
@@ -123,7 +123,7 @@ export default function ViewsCombined() {
               onClick={() => handleViewChange("board")}
               className={`flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm border rounded-xl cursor-pointer ${
                 viewMode === "board"
-                  ? "bg-violet-100 border-violet-400 text-violet-600"
+                  ? "bg-[var(--inside-card-bg)] border-violet-400 text-[var(--violet-text)] "
                   : "border-gray-300 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
               }`}
             >
@@ -144,8 +144,8 @@ export default function ViewsCombined() {
 
           {/* Modal */}
           {isOpen && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black/10 z-50 overflow-y-auto ">
-              <div className="bg-white  rounded-xl  w-[90%] max-w-md p-6 relative ">
+            <div className="fixed inset-0 flex items-center justify-center bg-[var(--black-overlay)] z-50 overflow-y-auto ">
+              <div className="bg-[var(--bg)]  rounded-xl  w-[90%] max-w-md p-6 relative ">
                 {/* Close Button */}
                 <button
                   onClick={() => setIsOpen(false)}

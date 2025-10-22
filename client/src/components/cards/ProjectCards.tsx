@@ -26,7 +26,7 @@ type ViewMode = "list" | "card";
 
 export default function ProjectCards() {
   const projectsPerPage = 10; // Shared pagination setting
-  const [viewMode, setViewMode] = useState<ViewMode>("list");
+  const [viewMode, setViewMode] = useState<ViewMode>("card");
   const [searchTerm, setSearchTerm] = useState("");
 
   // --- START: Data and State moved from children ---
@@ -81,9 +81,11 @@ export default function ProjectCards() {
   const onDeleteProject = async (projectId: string) => {
     try {
       const authUser = JSON.parse(localStorage.getItem("authUser") || "{}");
-      await axios.delete(`http://localhost:3000/projects/${projectId}`, {
-        headers: { Authorization: `Bearer ${authUser.token}` },
-      });
+      await axios.put(
+        `http://localhost:3000/projects/${projectId}/trash`,
+        {},
+        { headers: { Authorization: `Bearer ${authUser.token}` } }
+      );
       setProjects((prev) => prev.filter((p) => p._id !== projectId));
     } catch (err) {
       console.error("Error moving to trash:", err);
@@ -127,8 +129,8 @@ export default function ProjectCards() {
   // --- Shared Modal Wrapper (CLEANUP) ---
   const ProjectModal = () =>
     isProjectModalOpen && (
-      <div className="fixed inset-0 bg-black/10 flex items-center justify-center z-50">
-        <div className="relative bg-white p-6 rounded-xl shadow-lg w-[90%] max-w-md">
+      <div className="fixed inset-0 bg-[var(--black-overlay)] flex items-center justify-center z-50">
+        <div className="relative bg-[var(--bg)] p-6 rounded-xl shadow-lg w-[90%] max-w-md">
           <button
             onClick={() => {
               setIsProjectModalOpen(false);
@@ -151,16 +153,16 @@ export default function ProjectCards() {
     );
 
   return (
-    <div className="p-4 border border-gray-200 rounded-2xl">
+    <div className="p-4 border border-[var(--border)] rounded-2xl">
       <header className="flex justify-between items-center mb-6 ">
         <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--light-text)] " />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search project..."
-            className="border border-gray-300 pl-10 pr-3 py-2 rounded-xl w-full focus:ring-1 focus:ring-violet-400 outline-none text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
+            className="border  border-[var(--border)] pl-10 pr-3 py-2 rounded-xl w-full focus:ring-1 focus:ring-violet-400 outline-none text-sm "
           />
         </div>
 
@@ -171,10 +173,10 @@ export default function ProjectCards() {
             <div className="flex gap-2">
               <button
                 onClick={() => setViewMode("list")}
-                className={`flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm border rounded-xl cursor-pointer ${
+                className={`flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm border  border-[var(--border)] rounded-xl cursor-pointer ${
                   viewMode === "list"
-                    ? "bg-violet-100 border-violet-400 text-violet-600"
-                    : "border-gray-300 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
+                    ? "bg-[var(--inside-card-bg)] border-violet-400 text-[var(--violet-text)]"
+                    : "border-[var(--border-color)] hover:bg-[var(--hover-bg)]"
                 }`}
               >
                 <List className="h-4 w-4" />
@@ -183,10 +185,10 @@ export default function ProjectCards() {
 
               <button
                 onClick={() => setViewMode("card")}
-                className={`flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm border rounded-xl cursor-pointer ${
+                className={`flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm border border-[var(--border)] rounded-xl cursor-pointer ${
                   viewMode === "card"
-                    ? "bg-violet-100 border-violet-400 text-violet-600"
-                    : "border-gray-300 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
+                    ? "bg-[var(--inside-card-bg)] border-violet-400 text-[var(--violet-text)]"
+                    : "border-[var(--border)] hover:bg-[var(--hover-bg)]"
                 }`}
               >
                 <LayoutGrid className="h-4 w-4" />

@@ -89,14 +89,14 @@ export default function CardsModeProjects({
               key={item._id || index}
               className={`flex flex-col gap-3 rounded-xl p-4 shadow-sm transition ${
                 index % 2 === 0
-                  ? "bg-violet-50 border border-gray-200"
-                  : "bg-white border border-gray-200"
+                  ? "bg-[var(--cards-bg)] border border-[var(--border)]"
+                  : "bg-[var(--bg)] border border-[var(--border)]"
               }`}
             >
               {/* Header */}
               <header className="flex justify-between items-center">
                 <button
-                  className="font-medium text-base text-left text-slate-800 hover:underline cursor-pointer"
+                  className="font-medium text-base text-left  hover:underline cursor-pointer"
                   onClick={() => setSelectedProjectId(item._id)}
                 >
                   {item.title}
@@ -122,7 +122,7 @@ export default function CardsModeProjects({
                     </button>
                     {isDropdownOpen == item._id && (
                       <div
-                        className="absolute top-4 z-50 bg-white right-0 shadow-lg rounded-md border border-gray-200"
+                        className="absolute top-4 z-50 bg-[var(--bg)] right-0 shadow-lg rounded-md border border-[var(--border)]"
                         ref={dropdownRef}
                       >
                         <ActionDropdown
@@ -147,17 +147,17 @@ export default function CardsModeProjects({
               </header>
 
               {/* Info */}
-              <section className="grid grid-cols-2 gap-3 text-sm text-slate-600">
+              <section className="grid grid-cols-2 gap-3 text-sm ">
                 <div>
-                  <p className="text-gray-500">Incharge</p>
+                  <p className="text-[var(--light-text)] ">Incharge</p>
                   <p className="font-medium">{item.inChargeName || "N/A"}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500">Role</p>
+                  <p className="text-[var(--light-text)] ">Role</p>
                   <p className="font-medium">{item.role || "N/A"}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500">Tasks</p>
+                  <p className="text-[var(--light-text)] ">Tasks</p>
                   <p className="font-medium">
                     {item.completedTasks || 0}/{item.totalTasks || 0}
                   </p>
@@ -179,10 +179,10 @@ export default function CardsModeProjects({
               {/* Progress */}
               <div>
                 <div className="flex justify-between items-center text-sm mb-1">
-                  <p className="text-gray-500">Progress</p>
+                  <p className="text-[var(--light-text)]  ">Progress</p>
                   <p className="font-medium">{item.progress || 0}%</p>
                 </div>
-                <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                <div className="h-2 w-full bg-[var(--inside-card-bg)] rounded-full overflow-hidden">
                   <div
                     className="h-full bg-violet-500"
                     style={{ width: `${item.progress || 0}%` }}
@@ -193,7 +193,7 @@ export default function CardsModeProjects({
               {/* Footer */}
               <footer className="flex gap-2 mt-2">
                 <button
-                  className="flex-1 border border-gray-200 rounded-lg py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                  className="flex-1 border border-[var(--border)] rounded-lg py-2 text-sm hover:bg-[var(--hover-bg)] cursor-pointer"
                   onClick={() => setSelectedProjectId(item._id)}
                 >
                   View Details
@@ -201,7 +201,7 @@ export default function CardsModeProjects({
 
                 <button
                   onClick={() => handleEdit(item)}
-                  className="flex-1 border relative border-violet-200 text-violet-600 rounded-lg py-2 text-sm hover:bg-violet-50 cursor-pointer"
+                  className="flex-1 border relative border-[var(--border)] text-[var(--violet-text)] rounded-lg py-2 text-sm hover:bg-[var(--violet-hover-bg)] cursor-pointer hover:text-[var(--text-primary)] "
                 >
                   Edit Info
                 </button>
@@ -220,11 +220,11 @@ export default function CardsModeProjects({
       )}
 
       {/* Pagination (now uses props) */}
-      <footer className="flex justify-between items-center mt-6 text-sm text-gray-600">
+      <footer className="flex justify-between items-center mt-6 text-sm text-[var(--light-text)] ">
         <button
           onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
           disabled={currentPage === 1}
-          className="px-3 py-1 border border-gray-300 cursor-pointer rounded-lg disabled:opacity-50"
+          className="px-3 py-1 border border-[var(--border)] cursor-pointer rounded-lg disabled:opacity-50"
         >
           Prev
         </button>
@@ -234,7 +234,7 @@ export default function CardsModeProjects({
             <button
               key={num}
               onClick={() => setCurrentPage(num)}
-              className={`px-3 py-1 rounded-lg border ${
+              className={`px-3 py-1 rounded-lg border border-[var(--border)] ${
                 num === currentPage
                   ? "bg-violet-500 text-white border-violet-500"
                   : "hover:bg-gray-100"
@@ -248,7 +248,7 @@ export default function CardsModeProjects({
         <button
           onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
           disabled={currentPage === totalPages}
-          className="px-3 py-1 border border-gray-300 cursor-pointer rounded-lg disabled:opacity-50"
+          className="px-3 py-1 border border-[var(--border)] cursor-pointer rounded-lg disabled:opacity-50"
         >
           Next
         </button>

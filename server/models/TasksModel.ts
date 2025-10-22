@@ -36,6 +36,9 @@ const TasksSchema = new mongoose.Schema(
       type: Date,
     },
    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+   isTrashed: { type: Boolean, default: false },
+   deletedOn: { type: Date },
+   originalStatus: { type: String }, // Store original status before trashing
   },
   { timestamps: true }
 );

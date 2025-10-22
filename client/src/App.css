@@ -21,10 +21,17 @@ body {
   --main-bg: #ffffff;
   --cards-bg: #f1f1f1; /* gray-100 */
   --inside-card-bg: #ebecec;
-  --light-text: #777777;
+  --light-text: #6b6b6b;
+  --hover-bg: #f1f1f1;
+  --high-priority-color: #dc2626; /* red-600 */
+  --violet-text:#7C3AED; /* violet-600 */
+  --violet-hover-bg: #ece9fd; /* violet-50 */
+  --black-overlay: rgba(0, 0, 0, 0.4);
 
    /* Sidebar items*/
   --sidebar-bg-color: #c0a1fa;
+  --sidebar-links-color: #444343;
+  --sidebar-links-hover:#d3bbfd;
 }
 html.dark{
   /* Dark theme overrides */
@@ -40,9 +47,16 @@ html.dark{
   --cards-bg: rgba(255, 255, 255, 0.06); /* gray-800 */
   --inside-card-bg: rgba(255, 255, 255, 0.07);
   --light-text: #bbbbbb;
+  --hover-bg: #414040;
+  --high-priority-color: #f36e6e; /* red-400 */
+  --violet-text:#a78bfa; /* violet-400 */
+  --violet-hover-bg: #a08ebe; /* violet-800 */
+  --black-overlay: rgba(0, 0, 0, 0.7);
 
   /* Sidebar items*/
   --sidebar-bg-color: rgb(137, 100, 204);
+  --sidebar-links-color: #ebebeb;
+  --sidebar-links-hover:rgb(163, 130, 223);
 }
 /* For Chrome, Edge, Safari */
 ::-webkit-scrollbar {

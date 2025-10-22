@@ -14,6 +14,7 @@ import UserRoutes from "./routes/UserRouter";
 import ProfileRoutes from "./routes/ProfileRoutes";
 import AccountRoutes from "./routes/AccountRoutes";
 import NotificationsRoutes from "./routes/NotificationsRoutes";
+import TrashRoutes from "./routes/TrashRoutes";
 import AssignedTasksRoutes from "./routes/AssignedTasks";
 
 // DB connection
@@ -106,6 +107,7 @@ app.use("/user", UserRoutes);
 app.use("/profile", ProfileRoutes);
 app.use("/account", AccountRoutes);
 app.use("/notifications", NotificationsRoutes);
+app.use("/trash", TrashRoutes);
 
 // Default home route
 app.get("/", (req: Request, res: Response) => {

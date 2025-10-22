@@ -131,7 +131,23 @@ const UpdateTask = async (req: Request, res: Response) => {
     res.status(400).json({ error: error.message });
   }
 };
+// move to trash
+export const MoveToTrash = async (req: Request, res: Response) => {
+  try {
+    const task = await TasksModel.findByIdAndUpdate(
+      req.params.id,
+      { isTrashed: true, deletedOn: new Date() }, 
+      { new: true }
+    );
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
 
+    res.json(task);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
 const DeleteTask = async (req: Request, res: Response) => {
   try {
     const task = await TasksModel.findByIdAndDelete(req.params.id);
@@ -154,6 +170,82 @@ const DeleteTask = async (req: Request, res: Response) => {
     
   } catch (error: any) {
     res.status(400).json({ error: error.message });
+  }
+};
+
+// Get all trashed tasks
+const GetTrashedTasks = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.id;
+    const trashedTasks = await TasksModel.find({ userId, isTrashed: true });
+    
+    if (!trashedTasks || trashedTasks.length === 0) {
+      return res.status(404).json({ message: "No trashed tasks found" });
+    }
+    
+    res.status(200).json(trashedTasks);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Move task to trash
+const MoveTaskToTrash = async (req: Request, res: Response) => {
+  try {
+    const task = await TasksModel.findByIdAndUpdate(
+      req.params.id,
+      { 
+        isTrashed: true, 
+        deletedOn: new Date(),
+        originalStatus: req.body.originalStatus || "to do"
+      },
+      { new: true }
+    );
+    
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    res.status(200).json(task);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Restore task from trash
+const RestoreTask = async (req: Request, res: Response) => {
+  try {
+    const task = await TasksModel.findByIdAndUpdate(
+      req.params.id,
+      { 
+        isTrashed: false, 
+        deletedOn: null,
+        status: req.body.originalStatus || "to do"
+      },
+      { new: true }
+    );
+    
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    res.status(200).json(task);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Permanently delete task
+const PermanentlyDeleteTask = async (req: Request, res: Response) => {
+  try {
+    const task = await TasksModel.findByIdAndDelete(req.params.id);
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    res.status(200).json({ message: "Task permanently deleted", task });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
   }
 };
 const UpdateAllTasks = async (req:Request, res: Response)=>{
@@ -184,4 +276,17 @@ const recentTasks = await TasksModel.find({ userId })
   }
 };
 
-export default { GetAllTasks, CreateTask, GetOneTask, UpdateTask, DeleteTask , UpdateAllTasks , getRecentTasks, GetTaskStats};
+export default { 
+  GetAllTasks, 
+  CreateTask, 
+  GetOneTask, 
+  UpdateTask, 
+  DeleteTask, 
+  UpdateAllTasks, 
+  getRecentTasks, 
+  GetTaskStats,
+  GetTrashedTasks,
+  MoveTaskToTrash,
+  RestoreTask,
+  PermanentlyDeleteTask
+};

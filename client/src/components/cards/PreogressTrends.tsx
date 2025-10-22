@@ -22,18 +22,29 @@ const data = [
 
 export default function ProgressTrends() {
   return (
-    <div className="bg-white dark:bg-gray-800  p-3 border rounded-xl border-gray-200">
-      <p className="text-lg font-medium text-slate-800 mb-4 ">
-        Tasks Completed Per Month
-      </p>
+    <div className="bg-[var(--cards-bg)]  p-3 border rounded-xl border-[var(--border)]">
+      <p className="text-lg font-medium  mb-4 ">Tasks Completed Per Month</p>
 
       <ResponsiveContainer width="100%" height={210}>
-        <BarChart data={data} barCategoryGap="10%">
-          <XAxis dataKey="week" tickLine={false} axisLine={false} />
+        <BarChart
+          data={data}
+          barCategoryGap="10%"
+          style={{ color: "var(--light-text)" }}
+        >
+          <XAxis
+            dataKey="week"
+            tickLine={false}
+            axisLine={false}
+            style={{ color: "var(--light-text)" }}
+          />
 
           <Tooltip />
           {/* Removed <Legend /> */}
-          <Bar dataKey="completed" fill="#7c3aed" radius={[4, 4, 0, 0]} />
+          <Bar
+            dataKey="completed"
+            fill="var(--violet-text)"
+            radius={[4, 4, 0, 0]}
+          />
         </BarChart>
       </ResponsiveContainer>
     </div>

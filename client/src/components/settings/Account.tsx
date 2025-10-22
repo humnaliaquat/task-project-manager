@@ -208,18 +208,18 @@ export default function Account() {
 
   if (loading && formData.email === "") {
     return (
-      <div className="m-4 p-6 text-center text-gray-600">
+      <div className="m-4 p-6 text-center text-[var(--light-text)]">
         Loading user data...
       </div>
     );
   }
 
   return (
-    <div className="m-4 border border-gray-200 rounded-2xl p-6 bg-white space-y-10 shadow-sm">
+    <div className="m-4 border border-[var(--border)] rounded-2xl p-6 bg-[var(--cards-bg)] space-y-10 shadow-sm">
       {/* Header */}
       <div className="">
-        <p className="text-xl font-semibold text-gray-900">Account</p>
-        <p className="text-sm text-gray-500">
+        <p className="text-xl font-semibold ">Account</p>
+        <p className="text-sm text-[var(--light-text)]">
           Update your personal information and security details.
         </p>
       </div>
@@ -233,11 +233,11 @@ export default function Account() {
 
       {/* Change Email Section */}
       <section className="space-y-4">
-        <p className=" text-lg font-medium border-b border-gray-300 pb-2 text-gray-800">
+        <p className=" text-lg font-medium border-b border-[var(--border)] pb-2 ">
           Change Email
         </p>
 
-        <p className="text-gray-600">
+        <p className="text-[var(--light-text)]">
           Your current email is{" "}
           <span className="font-medium">{formData.email || "N/A"}</span>
         </p>
@@ -245,7 +245,7 @@ export default function Account() {
         <div className="flex flex-col sm:w-1/2">
           <label
             htmlFor="newEmail"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-medium text-[var(--light-text)] mb-1"
           >
             New Email Address
           </label>
@@ -256,7 +256,7 @@ export default function Account() {
             value={formData.newEmail} // Bind value
             onChange={handleChange} // Attach handler
             placeholder="Enter new email..."
-            className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-violet-500"
+            className="border border-[var(--border)] rounded-lg px-3 py-2 focus:outline-none focus:border-violet-500 bg-[var(--inside-card-bg)] text-[var(--text-primary)]"
             disabled={loading}
           />
         </div>
@@ -266,7 +266,7 @@ export default function Account() {
 
       {/* Change Password Section */}
       <section className="space-y-5">
-        <p className="text-lg font-medium border-b border-gray-300 pb-2 text-gray-800">
+        <p className="text-lg font-medium border-b border-[var(--border)] pb-2 ">
           Change Password
         </p>
         {/* Password Fields */}
@@ -274,7 +274,7 @@ export default function Account() {
           <div key={i} className="flex flex-col sm:w-1/2">
             <label
               htmlFor={field.name}
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium  mb-1"
             >
               {field.label}
             </label>
@@ -286,13 +286,13 @@ export default function Account() {
                 value={field.value} // Bind value to state
                 onChange={handleChange} // Attach handler
                 placeholder={field.placeholder}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 focus:outline-none focus:border-violet-500"
+                className="w-full border border-[var(--border)] rounded-lg px-3 py-2 pr-10 focus:outline-none focus:border-violet-500 bg-[var(--inside-card-bg)] text-[var(--text-primary)]"
                 disabled={loading}
               />
               <button
                 type="button"
                 onClick={() => field.setState((prev) => !prev)}
-                className="absolute cursor-pointer right-3 top-2.5 text-gray-500 hover:text-gray-700"
+                className="absolute cursor-pointer right-3 top-2.5 text-[var(--light-text)] hover:text-gray-700"
                 disabled={loading}
               >
                 {field.state ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -306,18 +306,20 @@ export default function Account() {
 
       {/* Delete Account */}
       <section className="space-y-3">
-        <p className=" font-medium border-b text-lg border-gray-300 pb-2 text-gray-800">
+        <p className=" font-medium border-b text-lg border-[var(--border)] pb-2 ">
           Delete Account
         </p>
-        <p className="text-gray-600">
+        <p className="text-[var(--light-text)]">
           Once you delete your account, there's{" "}
-          <span className="font-semibold text-red-500">no going back</span>.
-          Please be certain.
+          <span className="font-semibold text-[var(--high-priority-color)]">
+            no going back
+          </span>
+          . Please be certain.
         </p>
         <button
           type="button"
           onClick={DeleteUser} // Call the API function
-          className="flex items-center gap-2 text-red-600 hover:text-white border border-red-500 cursor-pointer hover:bg-red-500 transition rounded-lg px-4 py-2 font-medium w-fit disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 text-[var(--high-priority-color)] hover:text-white border border-red-500 cursor-pointer hover:bg-red-500 transition rounded-lg px-4 py-2 font-medium w-fit disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={loading}
         >
           <Trash2 size={16} />
@@ -328,10 +330,10 @@ export default function Account() {
       {/* --- */}
 
       {/* Footer Buttons */}
-      <div className="pt-6 flex justify-end gap-3 border-t border-gray-200">
+      <div className="pt-6 flex justify-end gap-3 border-t border-[var(--border)]">
         <button
           type="button"
-          className="w-full sm:w-auto border border-gray-300 hover:bg-gray-100 px-6 py-2.5 cursor-pointer rounded-lg font-medium transition disabled:opacity-50"
+          className="w-full sm:w-auto border border-[var(--border)] hover:bg-[var(--hover-bg)] px-6 py-2.5 cursor-pointer rounded-lg font-medium transition disabled:opacity-50"
           onClick={handleCancel}
           disabled={loading}
         >

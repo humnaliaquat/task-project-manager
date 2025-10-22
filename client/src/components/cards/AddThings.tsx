@@ -37,13 +37,13 @@ export default function AddThings() {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 rounded-xl">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4  rounded-xl">
       {/* Quick Actions */}
       {actions.map((item, index) => (
         <Link
           to={item.path}
           key={index}
-          className="p-2 flex items-center gap-4 border border-gray-200 rounded-xl bg-white s cursor-pointer"
+          className="p-2 flex items-center gap-4 border border-[var(--border)] rounded-xl bg-[var(--cards-bg)] cursor-pointer"
         >
           {/* Icon */}
           <div className="p-2 rounded-full bg-violet-100 flex items-center justify-center">
@@ -53,7 +53,7 @@ export default function AddThings() {
           {/* Text */}
           <div className="flex flex-col">
             <p className="text-base font-medium ">{item.name}</p>
-            <p className="text-sm  text-gray-600">{item.detail}</p>
+            <p className="text-sm  text-[var(--light-text)]">{item.detail}</p>
           </div>
         </Link>
       ))}
@@ -62,7 +62,7 @@ export default function AddThings() {
       {stats.map((stat, index) => (
         <div
           key={index}
-          className="p-2 flex items-center gap-4 border border-gray-200 rounded-xl bg-white "
+          className="p-2 flex items-center gap-4 border border-[var(--border)] rounded-xl bg-[var(--cards-bg)] "
         >
           {/* Icon */}
           <div className="p-2.5 rounded-full  bg-violet-100 flex items-center justify-center">

@@ -47,15 +47,13 @@ export default function AssignedTasks() {
     };
   }, []);
   return (
-    <div className="flex flex-col border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-xl ">
+    <div className="flex flex-col border border-[var(--border)] bg-[var(--cards-bg)]  rounded-xl ">
       {/* Header */}
-      <div className=" flex justify-between items-center border-gray-200 dark:border-gray-700 px-4 py-3">
-        <p className="text-lg font-medium text-slate-800 dark:text-white">
-          Assigned Tasks
-        </p>
+      <div className=" flex justify-between items-center border-[var(--border)]  px-4 py-3">
+        <p className="text-lg font-medium  ">Assigned Tasks</p>
         <div className="relative" ref={dropdownRef}>
           <button
-            className="flex justify-center items-center cursor-pointer text-slate-600 hover:text-gray-800 "
+            className="flex justify-center items-center cursor-pointer   "
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
             <MoreHorizontal size={17} />
@@ -73,29 +71,27 @@ export default function AssignedTasks() {
         {collection.map((item, index) => (
           <div
             key={index}
-            className="flex justify-between items-center w-full px-4 py-1 mt-2 hover:bg-violet-50 border rounded border-gray-300 dark:hover:bg-violet-900/30 transition"
+            className="flex justify-between items-center w-full px-4 py-1 mt-2 bg-[var(--inside-card-bg)]  border rounded border-[var(--border)]  transition"
           >
             {/* Left side */}
             <div className="flex flex-col">
-              <p className="text-base font-medium text-slate-800">
-                {item.name}
-              </p>
-              <div className="flex gap-3 text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-base font-medium ">{item.name}</p>
+              <div className="flex gap-3 text-sm text-[var(--light-text)] ">
                 <p>{item.detail}</p>
-                <p className="text-violet-400 font-medium">
+                <p className="text-[var(--violet-text)] font-medium">
                   Due {item.duedate}
                 </p>
               </div>
             </div>
 
             {/* Right side - Eye Icon */}
-            <button className="p-2 rounded-full hover:bg-violet-100 dark:hover:bg-violet-900 transition cursor-pointer">
-              <Eye className="w-5 h-5 text-slate-600" />
+            <button className="p-2 rounded-full hover:bg-[var(--hover-bg)]  transition cursor-pointer">
+              <Eye className="w-5 h-5 " />
             </button>
           </div>
         ))}
         <button
-          className="flex items-center justify-end gap-1.5 w-full text-sm font-medium text-violet-600 hover:text-violet-700 hover:underline transition-colors duration-200 p-2 cursor-pointer"
+          className="flex items-center justify-end gap-1.5 w-full text-sm font-medium text-[var(--violet-text)] hover:underline transition-colors duration-200 p-2 cursor-pointer"
           onClick={() => setIsAllOpen(true)}
         >
           <span>View All</span>

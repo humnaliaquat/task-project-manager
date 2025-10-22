@@ -32,7 +32,13 @@ export default function SettingsPage() {
   }, [tabParam]);
 
   return (
-    <div className="min-h-screen rounded-2xl">
+    <div
+      className="min-h-screen  pb-0.5"
+      style={{
+        backgroundColor: "var(--bg)",
+        color: "var(--text-primary)",
+      }}
+    >
       <DashboardHeader
         title="Settings"
         subtitle="Manage your profile, preferences, and application settings"
@@ -40,7 +46,7 @@ export default function SettingsPage() {
       />
 
       {/* Tabs */}
-      <div className="m-4 border border-gray-200 rounded-2xl p-2 bg-white">
+      <div className="m-4 border border-[var(--border)] rounded-2xl p-2 bg-[var(--cards-bg)] ">
         <div className="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3 overflow-x-auto no-scrollbar">
           {["Profile", "Appearance", "Notifications", "Account"].map((tab) => (
             <button
@@ -53,8 +59,8 @@ export default function SettingsPage() {
               className={`px-4 py-1.5 text-sm sm:text-base font-medium rounded-xl transition-all duration-200 flex-shrink-0 cursor-pointer
                 ${
                   activeTab === tab
-                    ? "bg-violet-50 text-violet-700 border border-violet-200"
-                    : "text-gray-600 hover:text-violet-600 hover:bg-gray-100 border border-transparent"
+                    ? "bg-[var(--inside-card-bg)] text-[var(--violet-text)] border border-[var(--violet-text)]"
+                    : "text-[var(--light-text)] hover:text-[var(--text-primary)] hover:bg-[var(--hover-bg)] border border-transparent"
                 }`}
             >
               {tab}
@@ -64,6 +70,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Tab Content */}
+
       {activeTab === "Profile" && <Profile />}
       {activeTab === "Appearance" && <Appearance />}
       {activeTab === "Notifications" && <Notifications />}

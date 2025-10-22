@@ -4,7 +4,6 @@ import { handleError } from "../../utils/utils";
 import { Link } from "react-router-dom";
 import AddNewTask from "../tasks/AddNewTask";
 import { X } from "lucide-react";
-import { getAuthUser } from "../../utils/auth";
 
 type Task = {
   title: string;
@@ -57,10 +56,10 @@ export default function TasksCreatedToday() {
     fetchTasks();
   }, []);
   return (
-    <div className="flex flex-col justify-between p-4 border border-gray-200 rounded-2xl min-h-[261px] w-full bg-white">
+    <div className="flex flex-col justify-between p-4 border border-[var(--border)] rounded-2xl min-h-[261px] w-full bg-[var(--cards-bg)]">
       {/* Header */}
       <div className="flex justify-between items-center mb-3">
-        <p className="text-lg font-medium text-slate-800">Recent Tasks</p>
+        <p className="text-lg font-medium ">Recent Tasks</p>
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="px-3 py-1 text-sm rounded-lg bg-violet-600 text-white hover:bg-violet-700 cursor-pointer"
@@ -69,8 +68,8 @@ export default function TasksCreatedToday() {
         </button>
         {/* Modal */}
         {isOpen && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 overflow-y-auto ">
-            <div className="bg-white  rounded-xl  w-[90%] max-w-md p-6 relative ">
+          <div className="fixed inset-0 flex items-center justify-center bg-[var(--black-overlay)] z-50 overflow-y-auto ">
+            <div className="bg-[var(--bg)]  rounded-xl  w-[90%] max-w-md p-6 relative ">
               {/* Close Button */}
               <button
                 onClick={() => setIsOpen(false)}
@@ -94,17 +93,17 @@ export default function TasksCreatedToday() {
       {/* Table / Empty State */}
       <div className="overflow-x-auto flex-1">
         {loading ? (
-          <p className="text-sm text-gray-500 text-center py-6">
+          <p className="text-sm text-[var(--light-text)] text-center py-6">
             Loading tasks...
           </p>
         ) : tasks.length === 0 ? (
-          <p className="text-sm text-gray-500 text-center py-6">
+          <p className="text-sm text-[var(--light-text)] text-center py-6">
             No recent tasks found
           </p>
         ) : (
           <table className="w-full border-collapse">
             <thead>
-              <tr className="text-left text-sm text-gray-500 border-b border-gray-300">
+              <tr className="text-left text-sm text-[var(--light-text)] border-b border-[var(--border)]">
                 <th className="py-2">Task Name</th>
                 <th className="py-2">Due Date</th>
                 <th className="py-2">Priority</th>
@@ -115,7 +114,7 @@ export default function TasksCreatedToday() {
               {tasks.map((task, index) => (
                 <tr
                   key={index}
-                  className="text-sm text-gray-700 odd:bg-white even:bg-violet-100 hover:bg-violet-200 "
+                  className="text-sm text-[var(--light-text)] odd:bg-[var(--bg)] even:bg-[var(--inside-card-bg)] border-b border-[var(--border)]"
                 >
                   <td className="py-2">{task.title}</td>
                   <td>
@@ -151,7 +150,7 @@ export default function TasksCreatedToday() {
         <div className="flex justify-end mt-3">
           <Link
             to={"/tasks"}
-            className="text-sm text-violet-600 hover:underline cursor-pointer"
+            className="text-sm text-[var(--violet-text)] hover:underline cursor-pointer"
           >
             See all tasks →
           </Link>

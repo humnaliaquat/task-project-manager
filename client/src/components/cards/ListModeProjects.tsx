@@ -118,8 +118,6 @@ export default function ListModeProjects({
     setIsSmScreenDropdownOpen(null);
   };
 
-  // NOTE: ProjectModal is now rendered in the parent ProjectCards.tsx
-
   return (
     <div className="w-full">
       {currentProjects.length === 0 && totalPages === 1 ? (
@@ -135,7 +133,7 @@ export default function ListModeProjects({
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>
-                <tr className="bg-gray-100 text-left text-sm text-gray-600">
+                <tr className="bg-[var(--inside-card-bg)] text-[var(--light-text)] text-left text-sm font-medium">
                   <th className="px-4 py-2">Project</th>
                   <th className="px-4 py-2">Status</th>
                   <th className="px-4 py-2">Due Date</th>
@@ -147,11 +145,11 @@ export default function ListModeProjects({
                 {currentProjects.map((project, idx) => (
                   <tr
                     key={project._id}
-                    className={`border-b border-gray-200 ${
-                      idx % 2 === 1 ? "bg-violet-50" : ""
+                    className={`border-b border-[var(--border)] ${
+                      idx % 2 === 1 ? "bg-[var(--inside-card-bg)]" : ""
                     }`}
                   >
-                    <td className="py-3 px-4 font-medium text-left">
+                    <td className="py-2 px-4 font-medium text-left">
                       <button
                         onClick={() => setSelectedProjectId(project._id)}
                         className="hover:underline cursor-pointer text-violet-600"

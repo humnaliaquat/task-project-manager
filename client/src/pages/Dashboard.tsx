@@ -11,7 +11,13 @@ export default function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div
+      className="flex min-h-screen"
+      style={{
+        backgroundColor: "var(--bg)",
+        color: "var(--text-primary)",
+      }}
+    >
       {/* Main content */}
       <div className="flex-1 flex flex-col transition-all duration-300">
         <DashboardHeader

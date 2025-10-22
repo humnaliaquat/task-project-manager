@@ -19,7 +19,13 @@ type TrashProject = {
 
 export default function Trash() {
   return (
-    <div className="min-h-screen">
+    <div
+      className="min-h-screen"
+      style={{
+        backgroundColor: "var(--bg)",
+        color: "var(--text-primary)",
+      }}
+    >
       {/* Header */}
       <DashboardHeader
         title="Trash"

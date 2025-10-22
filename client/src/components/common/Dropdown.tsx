@@ -32,7 +32,7 @@ export default function Dropdown({
     {
       name: "Settings",
       icon: Settings,
-      onClick: () => navigate("/settings"),
+      onClick: () => navigate("/settings?tab=Profile"),
     },
     {
       name: "Theme",
@@ -42,15 +42,15 @@ export default function Dropdown({
   ];
 
   return (
-    <div className="w-64 z-50 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+    <div className="w-64 z-[60] bg-[var(--bg)] border border-[var(--border)] rounded-xl shadow-lg overflow-hidden">
       {/* Header */}
-      <header className="flex items-center gap-3 p-4 border-b border-gray-200">
-        <span className="bg-violet-600 w-10 h-10 rounded-full flex items-center justify-center text-white font-medium">
+      <header className="flex items-center gap-3 p-4 border-b border-[var(--border)]">
+        <span className="bg-violet-600 w-10 h-10 rounded-full flex items-center justify-center text-[var(--primary-text)] font-medium">
           {avatarLetter}
         </span>
         <div className="flex flex-col">
-          <p className="font-medium text-gray-800">{name}</p>
-          <p className="text-gray-500 text-sm truncate">{email}</p>
+          <p className="font-medium ">{name}</p>
+          <p className="text-[var(--light-text)] text-sm truncate">{email}</p>
         </div>
       </header>
 
@@ -60,7 +60,7 @@ export default function Dropdown({
           <button
             key={index}
             onClick={item.onClick}
-            className="flex w-full items-center gap-2 px-3 py-2.5 rounded-lg text-gray-700 hover:bg-violet-50 focus:bg-gray-100 focus:outline-none cursor-pointer"
+            className="flex w-full items-center gap-2 px-3 py-2.5 rounded-lg  hover:bg-[var(--hover-bg)]    cursor-pointer"
           >
             <item.icon size={18} />
             <span>{item.name}</span>
@@ -69,13 +69,13 @@ export default function Dropdown({
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 p-2">
+      <footer className="border-t border-[var(--border)] p-2">
         <button
           onClick={() => {
             logout();
             navigate("/login");
           }}
-          className="flex w-full items-center gap-2 px-3 py-2.5 rounded-lg text-red-600 hover:bg-violet-50  focus:bg-red-50 focus:outline-none cursor-pointer"
+          className="flex w-full items-center gap-2 px-3 py-2.5 rounded-lg text-red-600 hover:bg-[var(--hover-bg)]  focus:bg-red-50 focus:outline-none cursor-pointer"
         >
           <LogOut size={18} />
           <span>Logout</span>

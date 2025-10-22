@@ -17,11 +17,9 @@ export default function WeeklyProjectsChart() {
   ];
 
   return (
-    <div className="flex flex-col p-2 pl-4 bg-white rounded-xl border border-gray-200">
+    <div className="flex flex-col p-2 pl-4 bg-[var(--cards-bg)] rounded-xl border border-[var(--border)]">
       {/* Title aligned to left */}
-      <p className="text-lg font-medium text-gray-800 dark:text-white mb-3 text-left">
-        Weekly Projects
-      </p>
+      <p className="text-lg font-medium  mb-3 text-left">Weekly Projects</p>
 
       {/* Chart centered */}
       <div className="flex justify-center">
@@ -44,8 +42,9 @@ export default function WeeklyProjectsChart() {
       </div>
 
       {/* Progress text under chart, centered */}
-      <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 text-center">
-        <span className="font-semibold text-violet-600">7</span> / 10 projects
+      <p className="mt-2 text-sm text-[var(--light-text)]  text-center">
+        <span className="font-semibold text-[var(--violet-text)]">7</span> / 10
+        projects
       </p>
     </div>
   );

@@ -11,6 +11,8 @@ router.get("/", verifyToken, TaskController.GetAllTasks);
 router.get("/stats", verifyToken, TaskController.GetTaskStats);
 // recent task 
 router.get("/recent", verifyToken, TaskController.getRecentTasks);
+// trashed tasks
+router.get("/trashed", verifyToken, TaskController.GetTrashedTasks);
 
 // GET a single task by ID
 router.get("/:id", verifyToken, TaskController.GetOneTask);
@@ -26,6 +28,11 @@ router.patch("/:id",verifyToken, TaskController.UpdateAllTasks);
 
 // DELETE a task by ID
 router.delete("/:id",verifyToken, TaskController.DeleteTask);
+
+// Trash operations
+router.put("/:id/trash", verifyToken, TaskController.MoveTaskToTrash);
+router.put("/:id/restore", verifyToken, TaskController.RestoreTask);
+router.delete("/:id/permanent", verifyToken, TaskController.PermanentlyDeleteTask);
 
 
 export default router;

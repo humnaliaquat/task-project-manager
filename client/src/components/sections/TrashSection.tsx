@@ -1,56 +1,181 @@
 import { useState, useEffect, useRef } from "react";
 import { RotateCcw, XCircle, Trash2, Search } from "lucide-react";
+import { toast } from "react-toastify";
+
 type TrashTask = {
-  id: number;
-  name: string;
+  _id: string;
+  title: string;
   deletedOn: string;
-  originalStatus: "To Do" | "In Progress" | "Completed";
+  originalStatus: string;
+  status: string;
 };
 
 type TrashProject = {
-  id: number;
-  name: string;
+  _id: string;
+  title: string;
   deletedOn: string;
-  originalStatus: "Active" | "Completed" | "On Hold";
+  originalStatus: string;
+  status: string;
 };
 export default function TrashSection() {
   const [activeTab, setActiveTab] = useState<"tasks" | "projects">("tasks");
-  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [trashTasks, setTrashTasks] = useState<TrashTask[]>([]);
+  const [trashProjects, setTrashProjects] = useState<TrashProject[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const trashTasks: TrashTask[] = [
-    {
-      id: 1,
-      name: "Fix navbar bug",
-      deletedOn: "21 Sept",
-      originalStatus: "To Do",
-    },
-    {
-      id: 2,
-      name: "Write docs",
-      deletedOn: "19 Sept",
-      originalStatus: "Completed",
-    },
-  ];
+  // Get auth token
+  const getAuthToken = () => {
+    const authUser = JSON.parse(localStorage.getItem("authUser") || "{}");
+    return authUser.token;
+  };
 
-  const trashProjects: TrashProject[] = [
-    {
-      id: 1,
-      name: "E-commerce App",
-      deletedOn: "18 Sept",
-      originalStatus: "Active",
-    },
-    {
-      id: 2,
-      name: "Portfolio Site",
-      deletedOn: "10 Sept",
-      originalStatus: "Completed",
-    },
-  ];
+  // Fetch trashed items from API
+  const fetchTrashedItems = async () => {
+    try {
+      setIsLoading(true);
+      const token = getAuthToken();
+      if (!token) {
+        toast.error("Not authenticated");
+        return;
+      }
+
+      const res = await fetch("http://localhost:3000/trash", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch trashed items");
+      }
+
+      const data = await res.json();
+      setTrashTasks(data.tasks || []);
+      setTrashProjects(data.projects || []);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to load trashed items");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Restore items
+  const restoreItems = async (
+    itemIds: string[],
+    type: "tasks" | "projects"
+  ) => {
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        toast.error("Not authenticated");
+        return;
+      }
+
+      const body =
+        type === "tasks" ? { taskIds: itemIds } : { projectIds: itemIds };
+
+      const res = await fetch("http://localhost:3000/trash/bulk-restore", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to restore items");
+      }
+
+      toast.success(`${type} restored successfully`);
+      setSelectedItems([]);
+      fetchTrashedItems(); // Refresh the list
+    } catch (err: any) {
+      toast.error(err.message || "Failed to restore items");
+    }
+  };
+
+  // Permanently delete items
+  const permanentlyDeleteItems = async (
+    itemIds: string[],
+    type: "tasks" | "projects"
+  ) => {
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        toast.error("Not authenticated");
+        return;
+      }
+
+      const body =
+        type === "tasks" ? { taskIds: itemIds } : { projectIds: itemIds };
+
+      const res = await fetch("http://localhost:3000/trash/bulk-delete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to delete items");
+      }
+
+      toast.success(`${type} permanently deleted`);
+      setSelectedItems([]);
+      fetchTrashedItems(); // Refresh the list
+    } catch (err: any) {
+      toast.error(err.message || "Failed to delete items");
+    }
+  };
+
+  // Empty trash
+  const emptyTrash = async () => {
+    if (
+      !window.confirm(
+        "Are you sure you want to empty the trash? This action cannot be undone."
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        toast.error("Not authenticated");
+        return;
+      }
+
+      const res = await fetch("http://localhost:3000/trash/empty", {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to empty trash");
+      }
+
+      toast.success("Trash emptied successfully");
+      fetchTrashedItems(); // Refresh the list
+    } catch (err: any) {
+      toast.error(err.message || "Failed to empty trash");
+    }
+  };
+
+  // Load data on mount
+  useEffect(() => {
+    fetchTrashedItems();
+  }, []);
 
   const currentData = activeTab === "tasks" ? trashTasks : trashProjects;
   const filteredData = currentData.filter((item) =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    item.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const selectAllRef = useRef<HTMLInputElement | null>(null);
@@ -63,39 +188,71 @@ export default function TrashSection() {
   }, [selectedItems, currentData.length]);
 
   const handleSelectAll = (checked: boolean) => {
-    if (checked) setSelectedItems(currentData.map((item) => item.id));
+    if (checked) setSelectedItems(currentData.map((item) => item._id));
     else setSelectedItems([]);
   };
 
-  const handleSelectOne = (id: number) => {
+  const handleSelectOne = (id: string) => {
     setSelectedItems((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
+
+  const handleBulkRestore = () => {
+    if (selectedItems.length === 0) return;
+    restoreItems(selectedItems, activeTab);
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedItems.length === 0) return;
+    if (
+      window.confirm(
+        `Are you sure you want to permanently delete ${selectedItems.length} ${activeTab}?`
+      )
+    ) {
+      permanentlyDeleteItems(selectedItems, activeTab);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    });
+  };
   return (
-    <div className="p-4 rounded-2xl flex flex-col w-full bg-white border border-gray-200">
+    <div className="p-4 rounded-2xl flex flex-col w-full bg-[var(--bg)] border border-[var(--border)]">
       {/* Top Controls */}
       <header className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-4">
         {/* Search */}
         <div className="relative w-full sm:w-72">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--light-text)] font-medium " />
           <input
             type="text"
             placeholder={`Search ${activeTab}...`}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="border border-gray-300 pl-10 pr-3 py-2 rounded-xl w-full  focus:border-violet-500 outline-none text-sm"
+            className="border   font-medium  border-[var(--border)] pl-10 pr-3 py-2 rounded-xl w-full  focus:border-violet-500 outline-none text-sm"
           />
         </div>
 
         {/* Bulk Actions */}
         <div className="flex flex-wrap justify-center sm:justify-end items-center gap-2">
           <button
+            onClick={emptyTrash}
+            className="flex items-center gap-2 px-4 py-2 text-sm rounded-xl border border-red-500 text-red-600 hover:bg-red-50 transition"
+          >
+            <Trash2 size={16} />
+            Empty Trash
+          </button>
+
+          <button
             disabled={selectedItems.length === 0}
+            onClick={handleBulkDelete}
             className={`flex items-center gap-2 px-4 py-2 text-sm rounded-xl border transition ${
               selectedItems.length > 0
                 ? "border-red-500 text-red-600 hover:bg-red-50"
-                : "border-gray-200 text-gray-400 cursor-not-allowed"
+                : "border-[var(--border)] text-[var(--light-text)] cursor-not-allowed"
             }`}
           >
             <XCircle size={16} />
@@ -104,10 +261,11 @@ export default function TrashSection() {
 
           <button
             disabled={selectedItems.length === 0}
+            onClick={handleBulkRestore}
             className={`flex items-center gap-2 px-4 py-2 text-sm rounded-xl border transition ${
               selectedItems.length > 0
                 ? "border-green-500 text-green-600 hover:bg-green-50"
-                : "border-gray-200 text-gray-400 cursor-not-allowed"
+                : "border-[var(--border)] text-[var(--light-text)] cursor-not-allowed"
             }`}
           >
             <RotateCcw size={16} />
@@ -117,7 +275,7 @@ export default function TrashSection() {
       </header>
 
       {/* Tabs */}
-      <div className="flex justify-between items-center border-b border-gray-200 ">
+      <div className="flex justify-between items-center border-b border-[var(--border)] ">
         <div className="flex gap-6">
           {["tasks", "projects"].map((tab) => (
             <button
@@ -130,7 +288,7 @@ export default function TrashSection() {
               className={`pb-2 font-medium cursor-pointer ${
                 activeTab === tab
                   ? "text-violet-600 border-b-2 border-violet-600"
-                  : "text-gray-500 hover:text-gray-700"
+                  : "text-[var(--light-text)] hover:text-[var(--text-primary)]"
               }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -140,17 +298,24 @@ export default function TrashSection() {
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto bg-white rounded-xl border border-gray-200 shadow-sm mt-4">
-        {filteredData.length === 0 ? (
-          <div className="text-center py-10 text-gray-500">
-            <Trash2 size={40} className="mx-auto mb-3 text-gray-400" />
+      <div className="overflow-x-auto bg-[var(--bg)] rounded-xl border border-[var(--border)] shadow-sm mt-4">
+        {isLoading ? (
+          <div className="text-center py-10 text-[var(--light-text)]">
+            Loading trashed items...
+          </div>
+        ) : filteredData.length === 0 ? (
+          <div className="text-center py-10 text-[var(--light-text)]">
+            <Trash2
+              size={40}
+              className="mx-auto mb-3 text-[var(--light-text)]"
+            />
             No {activeTab} found in trash
           </div>
         ) : (
           <table className="w-full text-sm border-collapse">
             <thead>
-              <tr className="bg-gray-50 text-gray-600">
-                <th className=" w-12 p-3.5 text-left">
+              <tr className="bg-[var(--cards-bg)] text-[var(--light-text)]">
+                <th className=" w-12 p-3 text-left">
                   <input
                     ref={selectAllRef}
                     type="checkbox"
@@ -162,56 +327,66 @@ export default function TrashSection() {
                     }
                   />
                 </th>
-                <th className="p-3 text-left">
+                <th className="p-2 text-left">
                   {activeTab === "tasks" ? "Task Name" : "Project Name"}
                 </th>
-                <th className="p-3 text-left">Deleted On</th>
-                <th className="p-3 text-left">Original Status</th>
-                <th className="p-3 text-left">Actions</th>
+                <th className="p-2 text-left">Deleted On</th>
+                <th className="p-2 text-left">Original Status</th>
+                <th className="p-2 text-left">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredData.map((item, i) => (
                 <tr
-                  key={item.id}
-                  className={`hover:bg-violet-50 transition ${
-                    i % 2 === 0 ? "bg-white" : "bg-gray-50"
+                  key={item._id}
+                  className={` transition ${
+                    i % 2 === 0 ? "bg-[var(--bg)]" : "bg-[var(--cards-bg)]"
                   }`}
                 >
-                  <td className="p-3">
+                  <td className="p-3 pt-2 pb-2 ">
                     <input
                       type="checkbox"
                       className="accent-violet-600 cursor-pointer"
-                      checked={selectedItems.includes(item.id)}
-                      onChange={() => handleSelectOne(item.id)}
+                      checked={selectedItems.includes(item._id)}
+                      onChange={() => handleSelectOne(item._id)}
                     />
                   </td>
-                  <td className="p-3 font-medium">{item.name}</td>
-                  <td className="p-3 text-gray-500">{item.deletedOn}</td>
-                  <td className="p-3">
+                  <td className="p-2 font-medium text-[var(--text-primary)] ">
+                    {item.title}
+                  </td>
+                  <td className="p-2 text-[var(--light-text)]">
+                    {formatDate(item.deletedOn)}
+                  </td>
+                  <td className="p-2">
                     <span
                       className={`px-2 py-1 text-xs rounded-full ${
-                        item.originalStatus === "Completed" ||
-                        item.originalStatus === "Active"
+                        item.status === "completed" ||
+                        item.status === "Completed" ||
+                        item.status === "Active"
                           ? "bg-green-100 text-green-700"
-                          : item.originalStatus === "In Progress" ||
-                            item.originalStatus === "On Hold"
+                          : item.status === "in progress" ||
+                            item.status === "In Progress" ||
+                            item.status === "On Hold"
                           ? "bg-yellow-100 text-yellow-700"
                           : "bg-gray-200 text-gray-600"
                       }`}
                     >
-                      {item.originalStatus}
+                      {item.status}
                     </span>
                   </td>
-                  <td className="p-3 flex gap-2">
+                  <td className="p-2 flex gap-2">
                     <button
                       title="Restore"
+                      onClick={() => restoreItems([item._id], activeTab)}
                       className="p-1.5 rounded-md hover:bg-green-50 text-green-600"
                     >
                       <RotateCcw size={18} />
                     </button>
                     <button
                       title="Delete Permanently"
+                      onClick={() =>
+                        permanentlyDeleteItems([item._id], activeTab)
+                      }
                       className="p-1.5 rounded-md hover:bg-red-50 text-red-600"
                     >
                       <XCircle size={18} />
@@ -226,14 +401,20 @@ export default function TrashSection() {
 
       {/* Floating Action Bar */}
       {selectedItems.length > 0 && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-white border shadow-lg px-6 py-3 rounded-xl flex gap-4 items-center animate-fadeIn">
-          <p className="text-sm text-gray-600">
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-[var(--bg)] border border-[var(--border)] shadow-lg px-6 py-3 rounded-xl flex gap-4 items-center animate-fadeIn">
+          <p className="text-sm text-[var(--light-text)]">
             {selectedItems.length} selected
           </p>
-          <button className="px-3 py-1.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700">
+          <button
+            onClick={handleBulkRestore}
+            className="px-3 py-1.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700"
+          >
             Restore Selected
           </button>
-          <button className="px-3 py-1.5 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700">
+          <button
+            onClick={handleBulkDelete}
+            className="px-3 py-1.5 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
+          >
             Delete Selected
           </button>
         </div>

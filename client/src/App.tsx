@@ -7,7 +7,7 @@ import { AuthProvider } from "./context/AuthContext";
 export default function App() {
   return (
     <div
-      className="min-h-screen bg-[var(--bg)] text-gray-900 = transition-colors duration-300 m-0 p-0"
+      className="min-h-screen bg-[var(--bg)] text-[var(--text-primary)]  transition-colors duration-300 m-0 p-0"
       style={{ backgroundColor: "var(--bg)" }}
     >
       <AuthProvider>

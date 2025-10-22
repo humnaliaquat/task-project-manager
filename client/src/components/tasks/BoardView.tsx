@@ -12,7 +12,7 @@ type Task = {
   description?: string;
   dueDate?: string;
   priority?: string;
-  status: "todo" | "in progress" | "completed";
+  status: "to do" | "in progress" | "completed";
 };
 
 type Props = {
@@ -111,7 +111,7 @@ export default function BoardView({ tasks, loading, setTasks }: Props) {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start relative">
         {columns.map((col) => {
           const filteredTasks = tasks.filter((task) => task.status === col.id);
 
@@ -158,7 +158,7 @@ export default function BoardView({ tasks, loading, setTasks }: Props) {
                   <div
                     {...provided.droppableProps}
                     ref={provided.innerRef}
-                    className="flex flex-col gap-3 flex-1 min-h-[100px] max-h-[600px] overflow-y-auto"
+                    className="flex flex-col gap-3 flex-1 min-h-[100px] max-h-[600px] overflow-y-auto relative z-0"
                   >
                     {filteredTasks.length > 0 ? (
                       filteredTasks.map((task, index) => (
@@ -172,16 +172,29 @@ export default function BoardView({ tasks, loading, setTasks }: Props) {
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
+                              style={{
+                                ...provided.draggableProps.style,
+                                transform: snapshot.isDragging
+                                  ? provided.draggableProps.style?.transform
+                                  : "none",
+                                transition: snapshot.isDragging
+                                  ? "transform 0.1s ease"
+                                  : undefined,
+                                zIndex: snapshot.isDragging ? 9999 : "auto",
+                                position: snapshot.isDragging
+                                  ? "relative"
+                                  : "static",
+                              }}
                               className={`bg-[var(--inside-card-bg)] rounded-lg shadow-sm border border-[var(--border)] p-3 border-l-4 ${
                                 col.color
                               } ${
                                 snapshot.isDragging
-                                  ? "shadow-lg scale-[1.02] border-l-8"
+                                  ? "shadow-xl scale-[1.03] border-l-8"
                                   : ""
                               }`}
                             >
                               <div className="flex justify-between items-center mb-2">
-                                <p className="text-sm font-medium text-gray-700">
+                                <p className="text-sm font-medium ">
                                   {task.title}
                                 </p>
                                 <div className="flex items-center gap-2">
@@ -202,10 +215,10 @@ export default function BoardView({ tasks, loading, setTasks }: Props) {
                                   </button>
                                 </div>
                               </div>
-                              <p className="text-xs text-gray-500 mb-2">
+                              <p className="text-xs  mb-2">
                                 {task.description || "No description"}
                               </p>
-                              <div className="flex justify-between text-xs text-gray-500">
+                              <div className="flex justify-between text-xs text-[var(--light-text)]">
                                 <p>
                                   {task.dueDate
                                     ? new Date(task.dueDate).toLocaleDateString(
@@ -220,12 +233,12 @@ export default function BoardView({ tasks, loading, setTasks }: Props) {
                                 </p>
                                 <p
                                   className={`font-medium ${
-                                    task.priority === "High"
-                                      ? "text-red-500"
-                                      : "text-gray-500"
+                                    task.priority === "high"
+                                      ? "text-[var(--high-priority-color)]"
+                                      : "text-[var(--light-text)]"
                                   }`}
                                 >
-                                  {task.priority || "—"}
+                                  {task.priority?.toLocaleUpperCase() || "—"}
                                 </p>
                               </div>
                             </div>
@@ -233,7 +246,7 @@ export default function BoardView({ tasks, loading, setTasks }: Props) {
                         </Draggable>
                       ))
                     ) : (
-                      <p className="text-sm text-gray-400 italic text-center py-4">
+                      <p className="text-sm text-[var(--light-text)] italic text-center py-4">
                         No tasks yet
                       </p>
                     )}
@@ -244,7 +257,7 @@ export default function BoardView({ tasks, loading, setTasks }: Props) {
 
               {/* Add Task Button */}
               <button
-                className="mt-4 w-full flex items-center justify-center gap-2 px-3 py-2 border border-dashed border-violet-400 cursor-pointer text-violet-600 rounded-lg hover:bg-violet-50 transition"
+                className="mt-4 w-full flex items-center justify-center gap-2 px-3 py-2 border border-dashed border-violet-400 cursor-pointer text-black bg-violet-200  rounded-lg hover:bg-violet-300 transition"
                 onClick={() => setIsOpen(true)}
               >
                 <Plus size={16} />

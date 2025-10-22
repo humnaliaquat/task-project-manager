@@ -146,7 +146,10 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
     >
       {/* Title */}
       <div className="flex flex-col gap-1 w-full">
-        <label htmlFor="project" className="text-sm font-medium text-gray-700">
+        <label
+          htmlFor="project"
+          className="text-sm font-medium text-[var(--text-primary)]"
+        >
           Project
         </label>
 
@@ -155,14 +158,14 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
           <button
             type="button"
             onClick={() => setIsOpen(!isOpen)}
-            className="flex justify-between items-center w-full border border-gray-200 p-2.5 rounded-lg"
+            className="flex justify-between items-center w-full border border-[var(--border)] p-2.5 rounded-lg cursor-pointer bg-[var(--inside-card-bg)]"
           >
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm font-medium text-[var(--text-primary)]">
               {projectSelected}
             </span>
             <ChevronDown
               size={16}
-              className={`text-gray-500 transform transition-transform duration-300 ${
+              className={`text-[var(--light-text)] transform transition-transform duration-300 ${
                 isOpen ? "rotate-180" : "rotate-0"
               }`}
             />
@@ -170,13 +173,13 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
 
           {/* Dropdown */}
           {isOpen && (
-            <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
-              <ul className="divide-y divide-gray-100">
+            <div className="absolute left-0 right-0 mt-1 bg-[var(--bg)] border border-[var(--border)] rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+              <ul className="divide-y divide-[var(--border)]">
                 {projects.length > 0 ? (
                   projects.map((project) => (
                     <li
                       key={project._id}
-                      className="px-4 py-2 text-sm hover:bg-violet-50 cursor-pointer"
+                      className="px-4 py-2 text-sm hover:bg-[var(--hover-bg)] cursor-pointer"
                       onClick={() => {
                         setProjectSelected(project.title);
                         setTask((prev) => ({
@@ -190,7 +193,7 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
                     </li>
                   ))
                 ) : (
-                  <li className="px-4 py-2 text-sm text-gray-400">
+                  <li className="px-4 py-2 text-sm text-[var(--light-text)]">
                     No projects found
                   </li>
                 )}
@@ -199,7 +202,10 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
           )}
         </div>
 
-        <label htmlFor="title" className="text-sm font-medium text-gray-700">
+        <label
+          htmlFor="title"
+          className="text-sm font-medium text-[var(--text-primary)]"
+        >
           Title
         </label>
         <input
@@ -209,7 +215,7 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
           value={task.title}
           onChange={handleChange}
           placeholder="Enter task title"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg 
+          className="w-full px-3 py-2 border border-[var(--border)] rounded-lg 
                      focus:outline-none focus:ring-none"
         />
       </div>
@@ -218,7 +224,7 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
       <div className="flex flex-col gap-1 w-full">
         <label
           htmlFor="description"
-          className="text-sm font-medium text-gray-700"
+          className="text-sm font-medium text-[var(--text-primary)]"
         >
           Description
         </label>
@@ -228,7 +234,7 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
           onChange={handleChange}
           id="description"
           placeholder="Enter task details..."
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none 
+          className="w-full px-3 py-2 border border-[var(--border)] rounded-lg resize-none 
                      focus:outline-none focus:ring-none focus:ring-violet-500"
           rows={3}
         ></textarea>
@@ -238,7 +244,10 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
       <div className="flex flex-col sm:flex-row gap-4 w-full">
         {/* Status Dropdown */}
         <div className="flex flex-col gap-1 w-full relative">
-          <label htmlFor="status" className="text-sm font-medium text-gray-700">
+          <label
+            htmlFor="status"
+            className="text-sm font-medium text-[var(--text-primary)]"
+          >
             Status <span className="text-red-500">*</span>
           </label>
           <button
@@ -248,16 +257,20 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
               closeAllDropdowns();
               setIsStatusOpen((prev) => !prev);
             }}
-            className={`w-full flex items-center justify-between px-3 py-2 border 
-                       border-gray-300 rounded-lg bg-white 
-                       ${status ? "text-gray-700" : "text-gray-400"}
+            className={`w-full flex items-center justify-between px-3 py-2 border cursor-pointer
+                       border-[var(--border)] rounded-lg bg-[var(--inside-card-bg)] 
+                       ${
+                         status
+                           ? "text-[var(--primary-text)] "
+                           : "text-[var(--light-text)] "
+                       }
                         focus:ring-none focus:ring-violet-500`}
           >
             {status || "Select status"}
-            <ChevronDown size={16} className="text-gray-500" />
+            <ChevronDown size={16} className="text-[var(--light-text)]" />
           </button>
           {isStatusOpen && (
-            <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg">
+            <div className="absolute z-10 mt-1 w-full bg-[var(--bg)] border border-[var(--border)] rounded-lg shadow-lg">
               {["To Do", "In Progress", "Completed"].map((s) => (
                 <div
                   key={s}
@@ -265,7 +278,7 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
                     setStatus(s);
                     setIsStatusOpen(false);
                   }}
-                  className="px-3 py-2 text-sm text-gray-700 hover:bg-violet-50 cursor-pointer"
+                  className="px-3 py-2 text-sm text-[var(--primary-text)] hover:bg-[var(--hover-bg)] cursor-pointer"
                 >
                   {s}
                 </div>
@@ -278,7 +291,7 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
         <div className="flex flex-col gap-1 w-full relative">
           <label
             htmlFor="dueDate"
-            className="text-sm font-medium text-gray-700"
+            className="text-sm font-medium text-[var(--text-primary)]"
           >
             Due Date <span className="text-red-500">*</span>
           </label>
@@ -288,18 +301,22 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
               closeAllDropdowns();
               setIsCalendarOpen((prev) => !prev);
             }}
-            className={`w-full flex items-center justify-between px-3 py-2 border 
-                       border-gray-300 rounded-lg bg-white 
-                       ${selected ? "text-gray-700" : "text-gray-400"}
+            className={`w-full flex items-center justify-between px-3 py-2 border  cursor-pointer
+                       border-[var(--border)] rounded-lg bg-[var(--inside-card-bg)] 
+                       ${
+                         selected
+                           ? "text-[var(--primary-text)]"
+                           : "text-[var(--light-text)]"
+                       }
                         focus:ring-none focus:ring-violet-500`}
           >
             {selected ? formatDate(selected) : "Select a date"}
 
-            <ChevronDown size={16} className="text-gray-500" />
+            <ChevronDown size={16} className="text-[var(--light-text)]" />
           </button>
           {isCalendarOpen && (
             <div
-              className="absolute z-20 -top-15 bg-white border border-gray-200 
+              className="absolute z-20 -top-15 bg-[var(--bg)] border border[var(--border)]
                             rounded-xl shadow-lg p-3 min-w-[280px] overflow-hidden"
             >
               <DayPicker
@@ -326,7 +343,10 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
       </div>
       {/* Priority Dropdown */}
       <div className="flex flex-col gap-1 w-full relative">
-        <label htmlFor="priority" className="text-sm font-medium text-gray-700">
+        <label
+          htmlFor="priority"
+          className="text-sm font-medium text-[var(--text-primary)]"
+        >
           Priority <span className="text-red-500">*</span>
         </label>
         <button
@@ -337,15 +357,19 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
             setIsPriorityOpen((prev) => !prev);
           }}
           className={`w-full flex items-center justify-between px-3 py-2 border 
-                border-gray-300 rounded-lg bg-white 
-                ${priority ? "text-gray-700" : "text-gray-400"}
+                border-[var(--border)] rounded-lg bg-[var(--inside-card-bg)] cursor-pointer 
+                ${
+                  priority
+                    ? "text-[var(--primary-text)]"
+                    : "text-[var(--light-text)]"
+                }
                  focus:ring-none focus:ring-violet-500`}
         >
           {priority || "Select priority"}
-          <ChevronDown size={16} className="text-gray-500" />
+          <ChevronDown size={16} className="text-[var(--light-text)]" />
         </button>
         {isPriorityOpen && (
-          <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg">
+          <div className="absolute z-10 mt-1 w-full bg-[var(--bg)] border border-[var(--border)] rounded-lg shadow-lg ">
             {["Low", "Medium", "High"].map((p) => (
               <div
                 key={p}
@@ -353,7 +377,7 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
                   setPriority(p);
                   setIsPriorityOpen(false);
                 }}
-                className="px-3 py-2 text-sm text-gray-700 hover:bg-violet-50 cursor-pointer"
+                className="px-3 py-2 text-sm text-[var(--primary-text)] hover:bg-[var(--hover-bg)] cursor-pointer"
               >
                 {p}
               </div>
@@ -366,7 +390,7 @@ export default function AddNewTask({ onClose, onTaskAdded }: Props) {
       <div className="flex justify-end gap-3 mt-4">
         <button
           type="button"
-          className="px-4 py-2 rounded-lg text-sm border border-gray-300 hover:bg-gray-100 cursor-pointer"
+          className="px-4 py-2 rounded-lg text-sm border border-[var(--border)] hover:bg-gray-100 cursor-pointer"
           onClick={onClose}
         >
           Cancel
