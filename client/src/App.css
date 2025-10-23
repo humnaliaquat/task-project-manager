@@ -95,6 +95,22 @@ body, p, span, button, input {
   --rdp-accent-color: #8b5cf6; 
   --rdp-accent-background-color: #f0f0f0; 
 }
+.Toastify__toast--success {
+  background: #22c55e !important; /* green-500 */
+  color: white !important;
+}
+.Toastify__toast--error {
+  background: #ef4444 !important; /* red-500 */
+  color: white !important;
+}
+.Toastify__toast--info {
+  background: #3b82f6 !important; /* blue-500 */
+  color: white !important;
+}
+.Toastify__toast--warning {
+  background: #f59e0b !important; /* amber-500 */
+  color: white !important;
+}
 
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

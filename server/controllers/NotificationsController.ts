@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import NotificationsModel, { INotification } from "../models/NotificationsModel";
+
 import { broadcastNotification } from "../server";
+import NotificationSettings from "../models/NotificationSettings";
 
 // GET /notifications - Get user's notifications
 export const getNotifications = async (req: Request, res: Response) => {
@@ -82,6 +84,28 @@ export const deleteNotification = async (req: Request, res: Response) => {
     return res.status(500).json({ message: err.message });
   }
 };
+
+async function sendNotification(userId: string, notificationData: any) {
+  const settings = await NotificationSettings.findOne({ userId });
+
+  if (!settings) return;
+
+  const { taskReminders, dueDateAlerts, emailUpdates } = settings;
+
+  // 🔍 Check preferences dynamically
+  if (
+    (notificationData.type === "task_due_soon" && !taskReminders) ||
+    (notificationData.type.includes("task") && !emailUpdates) ||
+    (notificationData.type.includes("project") && !emailUpdates) ||
+    (notificationData.type === "due_date" && !dueDateAlerts)
+  ) {
+    console.log("Skipping notification due to user preferences");
+    return;
+  }
+
+    broadcastNotification(userId, notificationData);
+
+}
 
 // Helper function to create notifications (used by other controllers)
 export const createNotification = async (

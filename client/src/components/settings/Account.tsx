@@ -2,16 +2,20 @@ import { useEffect, useState, type ChangeEvent } from "react";
 import { Eye, EyeOff, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 const API_BASE_URL = "http://localhost:3000";
 
 export default function Account() {
+  const navigate = useNavigate();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const { logout } = useAuth();
   // State to hold the current user data and form inputs
   const [formData, setFormData] = useState({
     // 'email' holds the *current* email, fetched from the backend.
@@ -128,9 +132,16 @@ export default function Account() {
         headers: getAuthHeader(),
       });
 
+      // ✅ Clear user data and token from localStorage
+      localStorage.removeItem("authUser");
+
       toast.info("Your account has been successfully deleted.");
-      // Redirect the user after successful deletion (e.g., to the homepage or login screen)
-      // window.location.href = "/login"; // Example redirection
+      logout();
+
+      // ✅ Redirect to register page after a short delay
+      setTimeout(() => {
+        navigate("/register");
+      }, 1200);
     } catch (err: any) {
       console.error("Error deleting user:", err);
       setError(

@@ -16,6 +16,7 @@ import AccountRoutes from "./routes/AccountRoutes";
 import NotificationsRoutes from "./routes/NotificationsRoutes";
 import TrashRoutes from "./routes/TrashRoutes";
 import AssignedTasksRoutes from "./routes/AssignedTasks";
+import notificationSettingsRoutes from "./routes/notificationSettingsRoutes";
 
 // DB connection
 import "./models/db";
@@ -108,7 +109,7 @@ app.use("/profile", ProfileRoutes);
 app.use("/account", AccountRoutes);
 app.use("/notifications", NotificationsRoutes);
 app.use("/trash", TrashRoutes);
-
+app.use("/api/notifications/preferences", notificationSettingsRoutes);
 // Default home route
 app.get("/", (req: Request, res: Response) => {
   res.send("Welcome! 🚀 Your server is running.");
